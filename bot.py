@@ -38,8 +38,21 @@ async def on_message(message):
     if message.author == client.user:
         return
     
-    if user_message.lower() == "hello" or "hi":
+    #if user_message.lower() == "hello" or user_message.lower() == "hi":
+     #   await message.channel.send(f"Hello {username}")
+      #  return
+    
+    #elif user_message.lower() == "goodbye" or user_message.lower() == "bye":
+     #   await message.channel.send(f'Bye {username}')
+
+    hello_phrases_to_check = ["hello", "hi"]
+    bye_phrases_to_check = ["goodbye", "bye"]
+
+    if any(phrase in user_message.lower() for phrase in hello_phrases_to_check):
         await message.channel.send(f"Hello {username}")
-        return
+    
+    elif any(phrase in user_message.lower() for phrase in bye_phrases_to_check):
+        await message.channel.send(f"Goodbye {username}")
+        
 
 client.run(TOKEN)
