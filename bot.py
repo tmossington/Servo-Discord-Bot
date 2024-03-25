@@ -36,7 +36,7 @@ async def on_ready():
 @bot.event
 async def on_message(message):
 
-    print(f'Message from {message.author.name}: {message.content}')
+    print(f'Message from {message.author.name}({message.channel.guild}, {message.channel.name}): {message.content}')
 
     username = str(message.author).split("#")[0]
     channel = str(message.channel.name)
