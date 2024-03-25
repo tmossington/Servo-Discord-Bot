@@ -2,6 +2,12 @@ import os
 import discord
 from dotenv import load_dotenv
 import random
+from discord.ext import commands
+from discord import app_commands
+import interactions
+from discord import Intents
+import config
+from random import choice
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
@@ -32,7 +38,8 @@ async def on_message(message):
     if message.author == client.user:
         return
     
-    if user_message == "Hello":
+    if user_message.lower() == "hello" or "hi":
         await message.channel.send(f"Hello {username}")
         return
+
 client.run(TOKEN)
