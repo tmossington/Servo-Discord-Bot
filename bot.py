@@ -9,6 +9,7 @@ import interactions
 from discord import Intents
 import config
 import random
+import requests
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
@@ -62,6 +63,35 @@ async def number(ctx):
     random_num = random.uniform(0, 10**10)
 
     await ctx.send(f"Random number: {random_num}")
+
+#Weather Command
+@bot.command()
+async def weather(ctx, location):
+    WeatherAPI_Key  = '9f7181e1f2bfd3070530d4b905ed5ef8'
+    url = f'https://api.openweathermap.org/data/2.5/weather?q={location}&appid={WeatherAPI_Key}&units=imperial'
+    # Fetch weather data from the API
+    response = requests.get(url)
+    data = response.json()
+    # print data to console for easier debugging
+    print(data)
+
+    # Check if location is valid
+    if 'message' in data:
+        error_message = data['message']
+        await ctx.send(f"Error: {error_message}")
+        return
+    
+    # Extract weather information
+    for weather_data in data:
+        weather = data['main']
+        temp = weather['temp']
+    # Send weather data in discord chat
+    await ctx.send(f"{temp}°F")
+
+
+
+
+
 
 
 bot.run(TOKEN)
