@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 import random
 from discord.ext import commands
 from discord import app_commands
+from discord.ext.commands import Bot
 import interactions
 from discord import Intents
 import config
@@ -15,36 +16,34 @@ GUILD = os.getenv('DISCORD_GUILD')
 
 intents = discord.Intents.all()
 
-client = discord.Client(intents = intents)
+intents.members = True
 
-@client.event
+bot = commands.Bot(command_prefix = '!', intents=intents)
+
+@bot.event
 async def on_ready():
-    for guild in client.guilds:
-        if guild.name == GUILD:
-            break
-    print(
-        f'{client.user} has connected to Discord'
-        f'{guild.name}(id: {guild.id})'
-    )
-    members = '\n - '.join([member.name for member in guild.members])
-    print(f'Guild Members:\n - {members}')
+    print(f'{bot.user} has connected to Discord')
+    for guild in bot.guilds:
+        #if guild.name == GUILD:
+         #   break
+        print(f'{guild.name}(id: {guild.id})')
+    
+        members = '\n - '.join([member.name for member in guild.members])
+        print(f'Guild Members:\n - {members}')
 
-@client.event
+
+
+@bot.event
 async def on_message(message):
+
+    print(f'Message from {message.author.name}: {message.content}')
+
     username = str(message.author).split("#")[0]
     channel = str(message.channel.name)
     user_message = str(message.content)
 
-    if message.author == client.user:
-        return
-    
-    #if user_message.lower() == "hello" or user_message.lower() == "hi":
-     #   await message.channel.send(f"Hello {username}")
-      #  return
-    
-    #elif user_message.lower() == "goodbye" or user_message.lower() == "bye":
-     #   await message.channel.send(f'Bye {username}')
-
+    if message.author == bot.user:
+        return    
     hello_phrases_to_check = ["hello", "hi"]
     bye_phrases_to_check = ["goodbye", "bye"]
 
@@ -53,6 +52,8 @@ async def on_message(message):
     
     elif any(phrase in user_message.lower() for phrase in bye_phrases_to_check):
         await message.channel.send(f"Goodbye {username}")
-        
 
-client.run(TOKEN)
+    await bot.process_commands(message)
+
+
+bot.run(TOKEN)
