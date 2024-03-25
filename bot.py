@@ -8,7 +8,7 @@ from discord.ext.commands import Bot
 import interactions
 from discord import Intents
 import config
-from random import choice
+import random
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
@@ -18,7 +18,7 @@ intents = discord.Intents.all()
 
 intents.members = True
 
-bot = commands.Bot(command_prefix = '!', intents=intents)
+bot = commands.Bot(command_prefix = '/', intents=intents)
 
 @bot.event
 async def on_ready():
@@ -30,6 +30,7 @@ async def on_ready():
     
         members = '\n - '.join([member.name for member in guild.members])
         print(f'Guild Members:\n - {members}')
+
 
 
 
@@ -52,8 +53,15 @@ async def on_message(message):
     
     elif any(phrase in user_message.lower() for phrase in bye_phrases_to_check):
         await message.channel.send(f"Goodbye {username}")
-
+   
     await bot.process_commands(message)
+
+
+@bot.command()
+async def number(ctx):
+    random_num = random.uniform(0, 10**10)
+
+    await ctx.send(f"Random number: {random_num}")
 
 
 bot.run(TOKEN)
