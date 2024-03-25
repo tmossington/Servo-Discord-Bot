@@ -66,7 +66,7 @@ async def number(ctx):
 
 #Weather Command
 @bot.command()
-async def weather(ctx, location):
+async def weather(ctx, *, location):
     WeatherAPI_Key  = '9f7181e1f2bfd3070530d4b905ed5ef8'
     url = f'https://api.openweathermap.org/data/2.5/weather?q={location}&appid={WeatherAPI_Key}&units=imperial'
     # Fetch weather data from the API
@@ -85,13 +85,13 @@ async def weather(ctx, location):
     for weather_data in data:
         weather = data['main']
         temp = weather['temp']
+        name = data['name']
+        sys = data['sys']
+        country = sys['country']
+    
     # Send weather data in discord chat
-    await ctx.send(f"{temp}°F")
-
-
-
-
-
+    await ctx.send(f"{name}, {country}: {temp}°F")
+        
 
 
 bot.run(TOKEN)
