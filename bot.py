@@ -10,6 +10,7 @@ from discord import Intents
 import config
 import random
 import requests
+from uszipcode import SearchEngine
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
@@ -67,8 +68,25 @@ async def number(ctx):
 #Weather Command
 @bot.command()
 async def weather(ctx, *, location):
+   #url = f'https://api.openweathermap.org/data/2.5/weather?q={location}&appid={WeatherAPI_Key}&units=imperial'
+    
+    # Check if the input is a valid zip code
+    search = SearchEngine()
+    zipcode_data = search.by_zipcode(location)
+
+    if zipcode_data:
+        # If a valid zip code, use it directly
+        city = zipcode_data.major_city
+        state = zipcode_data.state
+        location = f"{city}"
+    else:
+        # If not a valid zip code, use the input as a city name
+        location = location
+    
     WeatherAPI_Key  = '9f7181e1f2bfd3070530d4b905ed5ef8'
-    url = f'https://api.openweathermap.org/data/2.5/weather?q={location}&appid={WeatherAPI_Key}&units=imperial'
+    url = f'https://api.openweathermap.org/data/2.5/weather?q={location},us&appid={WeatherAPI_Key}&units=imperial'
+
+
     # Fetch weather data from the API
     response = requests.get(url)
     data = response.json()
@@ -96,7 +114,7 @@ async def weather(ctx, *, location):
         country = sys['country']
     
     # Send weather data in discord chat
-    await ctx.send(f"{name}, {country}: {temp}°F, {conditions}")
+    await ctx.send(f"{name}, {state}, {country}: {temp}°F, {conditions}")
         
 
 
