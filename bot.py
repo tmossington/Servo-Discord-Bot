@@ -141,6 +141,6 @@ async def price(ctx, *, symbol):
 
     name = data['Global Quote']['01. symbol']
     price = data['Global Quote']['05. price']
-    await ctx.send(f"{name}: {price}")
+    await ctx.send(f"{name}: ${price}")
 
 bot.run(TOKEN)
