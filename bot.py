@@ -144,6 +144,11 @@ async def price(ctx, *, symbol):
     print(requestResponse.json())
     data = requestResponse.json()
 
+    if len(data) == 0:
+        await ctx.send("Invalid symbol")
+        return
+    
+
     # Check if the response is a list or dictionary
 
     # if it's a list, handle each element individually
