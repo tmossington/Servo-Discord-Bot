@@ -68,7 +68,6 @@ async def number(ctx):
 #Weather Command
 @bot.command()
 async def weather(ctx, *, location):
-   #url = f'https://api.openweathermap.org/data/2.5/weather?q={location}&appid={WeatherAPI_Key}&units=imperial'
     
     # Check if the input is a valid zip code
     search = SearchEngine()
@@ -82,9 +81,11 @@ async def weather(ctx, *, location):
     else:
         # If not a valid zip code, use the input as a city name
         location = location
+        state = ""
     
     WeatherAPI_Key  = '9f7181e1f2bfd3070530d4b905ed5ef8'
-    url = f'https://api.openweathermap.org/data/2.5/weather?q={location},us&appid={WeatherAPI_Key}&units=imperial'
+    url = f'https://api.openweathermap.org/data/2.5/weather?q={location}&appid={WeatherAPI_Key}&units=imperial'
+
 
 
     # Fetch weather data from the API
@@ -114,7 +115,10 @@ async def weather(ctx, *, location):
         country = sys['country']
     
     # Send weather data in discord chat
-    await ctx.send(f"{name}, {state}, {country}: {temp}°F, {conditions}")
+    if state:
+        await ctx.send(f"{name}, {state}, {country}: {temp}°F, {conditions}")
+    else:
+        await ctx.send(f"{name}, {country}: {temp}°F, {conditions}")
         
 
 
