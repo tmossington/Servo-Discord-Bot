@@ -16,6 +16,7 @@ load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 GUILD = os.getenv('DISCORD_GUILD')
 
+
 intents = discord.Intents.all()
 
 intents.members = True
@@ -130,5 +131,16 @@ async def weather(ctx, *, location):
         await ctx.send(f"{name}, {country}: {temp}°F, {conditions}")
         
 
+# Financial Report
+@bot.command()
+async def price(ctx, *, symbol):
+    stockAPI_Key = os.getenv('alphavantage_API')
+    url =  f'https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol={symbol}&apikey={stockAPI_Key}'
+    r = requests.get(url)
+    data = r.json()
+
+    name = data['Global Quote']['01. symbol']
+    price = data['Global Quote']['05. price']
+    await ctx.send(f"{name}: {price}")
 
 bot.run(TOKEN)
