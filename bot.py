@@ -131,16 +131,39 @@ async def weather(ctx, *, location):
         await ctx.send(f"{name}, {country}: {temp}°F, {conditions}")
         
 
-# Financial Report
+# Financial Report using Tiingo API
 @bot.command()
 async def price(ctx, *, symbol):
-    stockAPI_Key = os.getenv('alphavantage_API')
-    url =  f'https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol={symbol}&apikey={stockAPI_Key}'
-    r = requests.get(url)
-    data = r.json()
+    stockAPI_Key = os.getenv('tiingo_API')
+    url = f'https://api.tiingo.com/iex/{symbol}?token={stockAPI_Key}'
 
-    name = data['Global Quote']['01. symbol']
-    price = data['Global Quote']['05. price']
-    await ctx.send(f"{name}: ${price}")
+    headers = {
+            'Content-Type': 'application/json'
+            }
+    requestResponse = requests.get(url,headers=headers)
+    print(requestResponse.json())
+    data = requestResponse.json()
+
+    # Check if the response is a list or dictionary
+
+    # if it's a list, handle each element individually
+    if isinstance(data, list):
+        for item in data:
+            price = item.get('last')
+            symbol = item.get('ticker')
+            await ctx.send(f"{symbol}: ${price}")
+
+     # if it's a dictionary, get the relevant information
+    elif isinstance(data, dict):
+        price = data.get('last')
+        symbol = data.get('ticker')
+        await ctx.send(f"{symbol}: ${price}")
+
+    # if it's neither, send an error message
+    else:
+        await ctx.send("Invalid response format.")
+
+
+
 
 bot.run(TOKEN)
