@@ -1,12 +1,21 @@
 This is SERVO (Server Engagement and Response Virtual Operator), a discord.py bot that helps support my Discord server in a variety of ways. For now, development is still on-going, so its features are a bit sparse. Currently, SERVO can:
 
-1. Scan for user greetings inside messages and give a friendly reply.
-2. Scan for user goodbye messages and give a polite goodbye.
-3. Return a random number if prompted.
-   
-Planned future implementation:
+- Greets new members to the server
 
-Weather app functionality. Return current weather report for a specified city, zip code, or county.
+- Scan user messages to respond to certain prompts
+
+- Return a random number if requestex
+
+- Give a current weather report for a user-specified city or zip code
+
+
+
+
+Planned future implementation and changes:
+
+Improvements to the weather report:
+1. Give addition information such as humidity
+2. Return a forecast for the upcoming days.
 
 Music app: play youtube videos through voice channel through a user requested queue system.
 
