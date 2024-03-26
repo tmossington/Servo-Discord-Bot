@@ -85,12 +85,18 @@ async def weather(ctx, *, location):
     for weather_data in data:
         weather = data['main']
         temp = weather['temp']
+        weather_list = data['weather']
+        weather_info = weather_list[0]
+        conditions = weather_info['description']
+        
+        
+        # Add name and country to the weather data
         name = data['name']
         sys = data['sys']
         country = sys['country']
     
     # Send weather data in discord chat
-    await ctx.send(f"{name}, {country}: {temp}°F")
+    await ctx.send(f"{name}, {country}: {temp}°F, {conditions}")
         
 
 
