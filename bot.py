@@ -32,6 +32,16 @@ async def on_ready():
     
         members = '\n - '.join([member.name for member in guild.members])
         print(f'Guild Members:\n - {members}')
+        print(guild.text_channels)
+
+# Welcome Message
+@bot.event
+async def on_member_join(member):
+    default_channel = discord.utils.get(member.guild.text_channels, name="the-boston-tea-party")
+    await default_channel.send(f"Welcome {member.mention} to the server!")
+
+    channel = discord.utils.get(member.guild.text_channels)
+    print(channel)
 
 # Greet and Goodbye Messages
 @bot.event
