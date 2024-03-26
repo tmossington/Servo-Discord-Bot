@@ -33,9 +33,7 @@ async def on_ready():
         members = '\n - '.join([member.name for member in guild.members])
         print(f'Guild Members:\n - {members}')
 
-
-
-
+# Greet and Goodbye Messages
 @bot.event
 async def on_message(message):
 
@@ -47,23 +45,24 @@ async def on_message(message):
 
     if message.author == bot.user:
         return    
-    hello_phrases_to_check = ["hello", "hi"]
-    bye_phrases_to_check = ["goodbye", "bye"]
-
-    if any(phrase in user_message.lower() for phrase in hello_phrases_to_check):
+    
+    message_content = user_message.lower()
+    if "hi" in message_content.split() or 'hello' in message_content.split():
         await message.channel.send(f"Hello {username}")
     
-    elif any(phrase in user_message.lower() for phrase in bye_phrases_to_check):
+    elif "bye" in message_content.split() or "goodbye" in message_content.split():
         await message.channel.send(f"Goodbye {username}")
-   
+
+
     await bot.process_commands(message)
 
-
+# Random Number Generator
 @bot.command()
 async def number(ctx):
     random_num = random.uniform(0, 10**10)
 
     await ctx.send(f"Random number: {random_num}")
+
 
 #Weather Command
 @bot.command()
