@@ -169,6 +169,54 @@ async def price(ctx, *, symbol):
         await ctx.send("Invalid response format.")
 
 
+@bot.command()
+async def crypto(ctx, *, symbol):
+    stockAPI_Key = os.getenv('tiingo_API')
+    #url = f'https://api.tiingo.com/tiingo/crypto/prices?tickers={symbol}&token={stockAPI_Key}'
+    url = f'https://api.tiingo.com/tiingo/crypto/top?tickers={symbol}&token={stockAPI_Key}'
+
+    headers = {
+            'Content-Type': 'application/json'
+            }
+    requestResponse = requests.get(url,headers=headers)
+    data = requestResponse.json()
+
+    # Verify if the symbol is valid
+    if len(data) == 0:
+        await ctx.send("Invalid symbol")
+        return
+    
+    # Check if the response is a list or dictionary
+
+    # if it's a list, handle each element individually
+    if isinstance(data, list):
+        for item in data:
+            symbol = item.get('ticker')
+            topOfBookData = item.get('topOfBookData')
+            # check if topOfBookData is a list or dict
+            if isinstance(topOfBookData, list):
+                for book_data in topOfBookData:
+                    price = book_data.get('lastPrice')
+                    await ctx.send(f"{symbol}: ${price}")
+            else:
+                price = topOfBookData.get('lastPrice')
+                await ctx.send(f"{symbol}: ${price}")
+
+     # if it's a dictionary, get the relevant information
+    elif isinstance(data, dict):
+        symbol = data.get('ticker')
+        topOfBookData = data.get('topOfBookData')
+        if isinstance(topOfBookData, list):
+            for book_data in topOfBookData:
+                price = book_data.get('lastPrice')
+                await ctx.send(f"{symbol}: ${price}")
+        else:
+            price = topOfBookData.get('lastPrice')
+            await ctx.send(f"{symbol}: ${price}")
+
+    # if it's neither, send an error message
+    else:
+        await ctx.send("Invalid response format.")
 
 
 bot.run(TOKEN)
