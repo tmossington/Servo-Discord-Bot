@@ -8,6 +8,8 @@ This is SERVO (Server Engagement and Response Virtual Operator), a discord.py bo
 
 - Give a current weather report for a user-specified city or zip code
 
+- Play Wordle
+
 
 
 
