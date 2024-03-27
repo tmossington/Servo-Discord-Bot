@@ -11,6 +11,7 @@ import config
 import random
 import requests
 from uszipcode import SearchEngine
+import wordle
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
@@ -217,6 +218,27 @@ async def crypto(ctx, *, symbol):
     # if it's neither, send an error message
     else:
         await ctx.send("Invalid response format.")
+
+
+game = None
+
+@bot.command()
+async def wordle(ctx, guess: str):
+    global game
+    if game is None:
+        await ctx.send("There's no active game. Start a new game with /new_wordle")
+        return
+    
+    response = game.send_guess(guess.lower())
+    await ctx.send(response)
+
+@bot.command()
+async def new_wordle(ctx):
+    import wordle
+    global game
+    game = wordle.Wordle(word=wordle.random_answer(), real_words=True)
+    await ctx.send("New game started! Guess away with /wordle.")
+
 
 
 bot.run(TOKEN)
