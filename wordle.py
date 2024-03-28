@@ -31,6 +31,8 @@ class Wordle:
         for i in range(6): # user gets 6 attempts
             # initialize variable for duplicate guess
             self.word_duplicate = list(self.word)
+            
+
 
             # initialize failed_dctionary_test
             # Add later if needed
@@ -159,11 +161,12 @@ class Wordle:
                 return f"You have run out of guesses, the word was {self.word}."
 
         # Return the response
-
+        guesses_left = (f"{6 - len(self.guesses)} guesses left.")
         if guessed_correctly:
             return responseString, True
         else:    
-            return responseString, False
+
+            return responseString, False, guesses_left
 
     # Reset guesses
         def reset(self):
