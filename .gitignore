@@ -1,2 +1,5 @@
 .env
 scrapbook.py
+__pycache__/dictionary.cpython-310.pyc
+__pycache__/randomanswer.cpython-310.pyc
+__pycache__/wordle.cpython-310.pyc
