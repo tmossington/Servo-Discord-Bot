@@ -12,9 +12,11 @@ def daily_random_word(daily: bool = True):
     if daily == True:
         UNIX = datetime.now().timestamp()
         iteration = int(math.floor((UNIX_reference - UNIX) / 86400))
-        return jumbled_words[iteration]
+        daily_answer = jumbled_words[iteration]
+        return daily_answer
     
 def random_word():
-    return jumbled_words[random.randint(0, len(jumbled_words))]
+    answer = jumbled_words[random.randint(0, len(jumbled_words))]
+    return answer
         
 
