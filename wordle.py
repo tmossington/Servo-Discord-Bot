@@ -80,8 +80,8 @@ class Wordle:
             print(responseString)
 
             if guess == self.word:
-                print(f"Congratulations! You have guessed the word in {i+1} attempts.")
-        print(f"Sorry, you have run out of attempts. The word was {self.word}.")
+                return(f"Congratulations! You have guessed the word in {i+1} attempts.")
+        return(f"Sorry, you have run out of attempts. The word was {self.word}.")
         quit()
     
 
@@ -156,7 +156,7 @@ class Wordle:
             if len(self.guesses) < 6:
                 self.guesses.append(guess)
             else:
-                return "You have run out of guesses, the word was {self.word}."
+                return f"You have run out of guesses, the word was {self.word}."
 
         # Return the response
 
