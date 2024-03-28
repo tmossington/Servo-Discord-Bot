@@ -242,11 +242,12 @@ async def crypto(ctx, *, symbol):
 
 
 game = None
-
+games = {}
 @bot.command()
 async def wordle(ctx, guess: str):
     global game
     import wordle
+    game = games.get(ctx.channel.id)
     if game is None:
         await ctx.send("There's no active game. Start a new game with /new_wordle")
         return
@@ -259,6 +260,7 @@ async def new_wordle(ctx):
     import wordle
     global game
     game = wordle.Wordle(word=randomanswer.random_word(), real_word=True)
+    games[ctx.channel.id] = game
     await ctx.send("New game started! Guess away with /wordle.")
 
 
@@ -272,6 +274,7 @@ async def wordle_day(ctx):
     import wordle
     word = randomanswer.daily_random_word()
     game = wordle.Wordle(word=word, real_word=True)
+    games[ctx.channel.id] = game
     daily_game_active = True
 
     if ctx.guild is None: # The command was sent in a DM
