@@ -13,6 +13,7 @@ import requests
 from uszipcode import SearchEngine
 import wordle
 import randomanswer
+import asyncio
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
@@ -46,14 +47,21 @@ async def on_member_join(member):
     channel = discord.utils.get(member.guild.text_channels)
     print(channel)
 
+
 # Greet and Goodbye Messages
 @bot.event
 async def on_message(message):
 
-    print(f'Message from {message.author.name}({message.channel.guild}, {message.channel.name}): {message.content}')
 
     username = str(message.author).split("#")[0]
-    channel = str(message.channel.name)
+
+    if message.guild:
+        print(f'Message from {message.author.name}({message.channel.guild}, {message.channel.name}): {message.content}')
+
+        channel = str(message.channel.name)
+    else:
+        print(f'Message from', {message.author.name}, " in DM: ", message.content)
+        channel = "Direct Message"
     user_message = str(message.content)
 
     if message.author == bot.user:
@@ -65,6 +73,18 @@ async def on_message(message):
     
     elif "bye" in message_content.split() or "goodbye" in message_content.split():
         await message.channel.send(f"Goodbye {username}")
+
+
+    ### Block of response for wordle_day command
+        
+    global game
+    global daily_game_active
+    if isinstance(message.channel, discord.DMChannel) and message.author != bot.user and daily_game_active:
+        guess = message.content
+        response = game.send_guess(guess)
+        await message.channel.send(response)
+        if game.is_over():
+            daily_game_active = False
 
 
     await bot.process_commands(message)
@@ -225,7 +245,12 @@ game = None
 
 @bot.command()
 async def wordle(ctx, guess: str):
+    if ctx.guild is None:
+        await ctx.send("This command can only be used in a server.")
+        return
+
     global game
+    import wordle
     if game is None:
         await ctx.send("There's no active game. Start a new game with /new_wordle")
         return
@@ -240,6 +265,25 @@ async def new_wordle(ctx):
     game = wordle.Wordle(word=randomanswer.random_answer(), real_word=True)
     await ctx.send("New game started! Guess away with /wordle.")
 
+
+daily_game_active = False
+
+@bot.command()
+async def wordle_day(ctx):
+    member = ctx.author
+    global game
+    global daily_game_active
+    import wordle
+    word = randomanswer.random_answer()
+    game = wordle.Wordle(word=word, real_word=True)
+    daily_game_active = True
+
+    if ctx.guild is None: # The command was sent in a DM
+        await ctx.send("New game started! Type your guess below.")
+    else: # The command was sent in a server
+        await member.create_dm()
+        await member.dm_channel.send("New game started! Type your guess below.")
+    
 
 
 bot.run(TOKEN)

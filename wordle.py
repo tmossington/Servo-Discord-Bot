@@ -167,4 +167,9 @@ class Wordle:
 
     # Reset guesses
         def reset(self):
-            self.guesses = []      
+            self.guesses = []   
+
+
+    # Game over
+    def is_over(self):
+        return len(self.guesses) >= 6
