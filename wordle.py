@@ -10,7 +10,7 @@ class Wordle:
         self.enforce_length = enforce_length
         self.real_word = real_word
         if random_daily:
-            self.word = randomanswer.random_word(daily=True).upper()
+            self.word = randomanswer.daily_random_word(daily=True).upper()
 
         # Track number of guesses
         self.guesses = []

@@ -258,7 +258,7 @@ async def wordle(ctx, guess: str):
 async def new_wordle(ctx):
     import wordle
     global game
-    game = wordle.Wordle(word=randomanswer.random_answer(), real_word=True)
+    game = wordle.Wordle(word=randomanswer.random_word(), real_word=True)
     await ctx.send("New game started! Guess away with /wordle.")
 
 
@@ -270,7 +270,7 @@ async def wordle_day(ctx):
     global game
     global daily_game_active
     import wordle
-    word = randomanswer.random_answer()
+    word = randomanswer.daily_random_word()
     game = wordle.Wordle(word=word, real_word=True)
     daily_game_active = True
 
