@@ -12,6 +12,7 @@ import random
 import requests
 from uszipcode import SearchEngine
 import wordle
+import randomanswer
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
@@ -236,7 +237,7 @@ async def wordle(ctx, guess: str):
 async def new_wordle(ctx):
     import wordle
     global game
-    game = wordle.Wordle(word=wordle.random_answer(), real_words=True)
+    game = wordle.Wordle(word=randomanswer.random_answer(), real_word=True)
     await ctx.send("New game started! Guess away with /wordle.")
 
 
