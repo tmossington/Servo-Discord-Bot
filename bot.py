@@ -245,10 +245,6 @@ game = None
 
 @bot.command()
 async def wordle(ctx, guess: str):
-    if ctx.guild is None:
-        await ctx.send("This command can only be used in a server.")
-        return
-
     global game
     import wordle
     if game is None:
