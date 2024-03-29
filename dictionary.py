@@ -1902,6 +1902,7 @@ words = [
     "jesus",
     "jetty",
     "jewel",
+    "jeffy",
     "jiffy",
     "jihad",
     "jilts",
@@ -8519,4 +8520,5 @@ jumbled_words = [
     "blase",
     "unite",
     "pilot",
+    "jeffy"
 ]
