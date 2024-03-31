@@ -47,11 +47,11 @@ class Wordle:
             
             # Failure checking block
             if failed_dict_test == True:
-                print("Word is not in the dictionary, please try again.")
+                print(f"Word is not in the dictionary, please try again.")
             elif " " in guess:
-                print("You have multiple words in your guess, please try again.")
+                print(f"You have multiple words in your guess, please try again.")
             elif len(guess) > len(self.word):
-                print("Your guess has too many letters, please try again with a 5 letter word.")
+                print(f"Your guess has too many letters, please try again with a 5 letter word.")
             
             # Prepare response list
             response = []
