@@ -98,7 +98,7 @@ async def number(ctx):
 
 
 #Weather Command
-
+@bot.command()
 async def weather(ctx, *, location):
     
     # Check if the input is a valid zip code
@@ -154,7 +154,7 @@ async def weather(ctx, *, location):
         
 
 # Financial Report using Tiingo API
-
+@bot.command()
 async def price(ctx, *, symbol):
     stockAPI_Key = os.getenv('tiingo_API')
     url = f'https://api.tiingo.com/iex/{symbol}?token={stockAPI_Key}'
@@ -191,7 +191,7 @@ async def price(ctx, *, symbol):
         await ctx.send("Invalid response format.")
 
 
-
+@bot.command()
 async def crypto(ctx, *, symbol):
     stockAPI_Key = os.getenv('tiingo_API')
     #url = f'https://api.tiingo.com/tiingo/crypto/prices?tickers={symbol}&token={stockAPI_Key}'
@@ -243,7 +243,7 @@ async def crypto(ctx, *, symbol):
 
 game = None
 games = {}
-
+@bot.command()
 async def wordle(ctx, guess: str):
     global game
     import wordle
@@ -255,7 +255,7 @@ async def wordle(ctx, guess: str):
     response = game.send_guess(guess.lower())
     await ctx.send(response)
 
-
+@bot.command()
 async def new_wordle(ctx):
     import wordle
     global game
@@ -266,7 +266,7 @@ async def new_wordle(ctx):
 
 daily_game_active = False
 
-
+@bot.command()
 async def wordle_day(ctx):
     member = ctx.author
     global game
