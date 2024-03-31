@@ -105,13 +105,13 @@ class Wordle:
             failed_dict_test = True
         
         if " " in guess:
-            return "You have multiple words in your guess, please try again."
+            return f"You have multiple words in your guess, please try again."
         elif self.enforce_length and len(guess) > len(self.word):
-            return "Your guess has too many letters, it can't be more than {len(list(self.word))} letters long."
+            return f"Your guess has too many letters, it can't be more than {len(list(self.word))} letters long."
         elif len(guess) < len(self.word):
-             return "Your guess has too few letters, it must be {len(list(self.word))} letters long."
+             return f"Your guess has too few letters, it must be {len(list(self.word))} letters long."
         elif failed_dict_test == True:
-            return "Word is not in the dictionary, please try again."
+            return f"Word is not in the dictionary, please try again."
             
         # Correct failed dictionary test if real world is guessed
         elif self.real_word and guess.lower() in dictionary.words:
