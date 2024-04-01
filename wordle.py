@@ -175,4 +175,5 @@ class Wordle:
 
     # Game over
     def is_over(self):
-        return len(self.guesses) >= 6
+        if self.guesses == 0:
+            return True
