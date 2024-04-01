@@ -13,7 +13,7 @@ class Wordle:
             self.word = randomanswer.daily_random_word(daily=True).upper()
 
         # Track number of guesses
-        self.guesses = []
+        self.guesses = 6
 
         # make sure guessed word is not a number or special character
         # keep track of the number of guesses
@@ -155,13 +155,13 @@ class Wordle:
 
         # Log the guess
         if log_guess:
-            if len(self.guesses) < 6:
-                self.guesses.append(guess)
-            else:
+            if self.guesses != 0:
+                self.guesses -= 1
+            if self.guesses == 0:
                 return f"You have run out of guesses, the word was {self.word}."
 
         # Return the response
-        guesses_left = (f"{6 - len(self.guesses)} guesses left.")
+        guesses_left = (f"{self.guesses} guesses left.")
         if guessed_correctly:
             return responseString, True
         else:    
@@ -170,7 +170,7 @@ class Wordle:
 
     # Reset guesses
         def reset(self):
-            self.guesses = []   
+            self.guesses = 6   
 
 
     # Game over
