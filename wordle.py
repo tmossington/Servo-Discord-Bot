@@ -153,14 +153,15 @@ class Wordle:
             if self.guesses != 0:
                 self.guesses -= 1
 
-        guesses_left = (f"{self.guesses} guesses left.")
+        guesses_left = (f"{self.guesses}")
+        guesses_made = 6 - self.guesses
 
 
         if guess == self.word:
             guessed_correctly = True
             self.guesses = 0
             game = None
-            return f"Congratulations! You have guessed the word in {6 - self.guesses} attempts. The game is over."
+            return f"Congratulations! You have guessed the word in {guesses_made} attempt(s). The game is over."
         elif guess != self.word:  
             guessed_correctly = False   
             if self.guesses == 0:
