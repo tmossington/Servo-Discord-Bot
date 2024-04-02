@@ -258,6 +258,12 @@ async def wordle(ctx, guess: str):
         return
     
     response = game.send_guess(guess.lower())
+
+    # Check if the game is over
+    if "The game is over" in response or "You have run out of guesses" in response:
+        # Remove game from the games dictionary
+        del games[ctx.channel.id]
+    print(response)
     await ctx.send(response)
 
 @bot.command()
