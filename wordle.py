@@ -24,7 +24,7 @@ class Wordle:
         # Make sure the word is 5 characters long and is in the dictionary
         if self.enforce_length and len(self.word) != 5:
             raise ValueError("Word must be 5 characters long.")
-        if self.real_word == True and self.word.lower() not in dictionary:
+        if self.real_word == True and self.word.upper() not in dictionary:
             raise ValueError("word must be present in the dictionary.")
         
         # Being iterating through the game
@@ -42,7 +42,7 @@ class Wordle:
 
             #real_word = TRUE
             if self.real_word == True:
-                if guess.lower() not in dictionary.words:
+                if guess.upper() not in dictionary.words:
                     failed_dict_test = True
             
             # Failure checking block
@@ -101,7 +101,7 @@ class Wordle:
         # cheating checks
 
         # real_word = true
-        if self.real_word == True and guess.lower() not in dictionary.words:
+        if self.real_word == True and guess.upper() not in dictionary.words:
             failed_dict_test = True
         
         if " " in guess:
@@ -114,7 +114,7 @@ class Wordle:
             return f"Word is not in the dictionary, please try again."
             
         # Correct failed dictionary test if real world is guessed
-        elif self.real_word and guess.lower() in dictionary.words:
+        elif self.real_word and guess.upper() in dictionary.words:
             failed_dict_test = False
 
         # Prepare response list

@@ -1,4 +1,4 @@
-from dictionary import jumbled_words
+from dictionary import words
 from datetime import datetime
 import math
 import random
@@ -12,11 +12,11 @@ def daily_random_word(daily: bool = True):
     if daily == True:
         UNIX = datetime.now().timestamp()
         iteration = int(math.floor((UNIX_reference - UNIX) / 86400))
-        daily_answer = jumbled_words[iteration]
+        daily_answer = words[iteration]
         return daily_answer
     
 def random_word():
-    answer = jumbled_words[random.randint(0, len(jumbled_words))]
+    answer = words[random.randint(0, len(words))]
     return answer
         
 
