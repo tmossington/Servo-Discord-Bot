@@ -77,14 +77,19 @@ async def on_message(message):
 
     ### Block of response for wordle_day command
         
-    global game
     global daily_game_active
     if isinstance(message.channel, discord.DMChannel) and message.author != bot.user and daily_game_active:
+        game = games.get(message.channel.id)
+        if game is None:
+            await message.channel.send("There's no active game. Start a new game with /wordle_day")
+            return
+        
         guess = message.content
         response = game.send_guess(guess)
         await message.channel.send(response)
         if game.is_over():
             daily_game_active = False
+            games.pop(message.channel.id)
 
 
     await bot.process_commands(message)
@@ -241,11 +246,11 @@ async def crypto(ctx, *, symbol):
         await ctx.send("Invalid response format.")
 
 
-game = None
+#game = None
 games = {}
 @bot.command()
 async def wordle(ctx, guess: str):
-    global game
+    #global game
     import wordle
     game = games.get(ctx.channel.id)
     if game is None:
@@ -258,7 +263,7 @@ async def wordle(ctx, guess: str):
 @bot.command()
 async def new_wordle(ctx):
     import wordle
-    global game
+    #global game
     game = wordle.Wordle(word=randomanswer.random_word(), real_word=True)
     games[ctx.channel.id] = game
     await ctx.send("New game started! Guess away with /wordle.")
@@ -269,7 +274,7 @@ daily_game_active = False
 @bot.command()
 async def wordle_day(ctx):
     member = ctx.author
-    global game
+    #global game
     global daily_game_active
     import wordle
     word = randomanswer.daily_random_word()
