@@ -246,7 +246,7 @@ async def crypto(ctx, *, symbol):
         await ctx.send("Invalid response format.")
 
 
-#game = None
+game = None
 games = {}
 @bot.command()
 async def wordle(ctx, guess: str):
