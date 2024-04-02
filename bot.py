@@ -285,13 +285,14 @@ async def wordle_day(ctx):
     import wordle
     word = randomanswer.daily_random_word()
     game = wordle.Wordle(word=word, real_word=True)
-    games[ctx.channel.id] = game
     daily_game_active = True
 
     if ctx.guild is None: # The command was sent in a DM
         await ctx.send("New game started! Type your guess below.")
+        games[ctx.channel.id] = game
     else: # The command was sent in a server
         await member.create_dm()
+        games[member.dm_channel.id] = game
         await member.dm_channel.send("New game started! Type your guess below.")
     
 
