@@ -148,25 +148,26 @@ class Wordle:
         for letter in response:
             responseString += letter
 
-        if guess == self.word:
-            guessed_correctly = True
-        else:  
-            guessed_correctly = False   
-
-        # Log the guess
+         # Log the guess
         if log_guess:
             if self.guesses != 0:
                 self.guesses -= 1
+
+        guesses_left = (f"{self.guesses} guesses left.")
+
+
+        if guess == self.word:
+            guessed_correctly = True
+            self.guesses = 0
+            game = None
+            return f"Congratulations! You have guessed the word in {6 - self.guesses} attempts. The game is over."
+        elif guess != self.word:  
+            guessed_correctly = False   
             if self.guesses == 0:
                 return f"You have run out of guesses, the word was {self.word}."
+            else:
+                return responseString, False, guesses_left
 
-        # Return the response
-        guesses_left = (f"{self.guesses} guesses left.")
-        if guessed_correctly:
-            return responseString, True
-        else:    
-
-            return responseString, False, guesses_left
 
     # Reset guesses
         def reset(self):
@@ -177,3 +178,4 @@ class Wordle:
     def is_over(self):
         if self.guesses == 0:
             return True
+        
