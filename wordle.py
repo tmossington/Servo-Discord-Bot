@@ -161,7 +161,10 @@ class Wordle:
             guessed_correctly = True
             self.guesses = 0
             #game = None
-            return f"Congratulations! You have guessed the word in {guesses_made} attempt(s). The game is over."
+            if guesses_made == 1:
+                return f"Congratulations! You have guessed the word in {guesses_made} attempt. The game is over."
+            else:
+                return f"Congratulations! You have guessed the word in {guesses_made} attempts. The game is over."
         elif guess != self.word:  
             guessed_correctly = False   
             if self.guesses == 0:
