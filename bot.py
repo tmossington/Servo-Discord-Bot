@@ -30,6 +30,7 @@ intents.members = True
 bot = commands.Bot(command_prefix = '/', intents=intents)
 
 connection, cursor = db.connect_to_db()
+message_sent = False
 
 @bot.event
 async def on_ready():
@@ -42,6 +43,29 @@ async def on_ready():
         members = '\n - '.join([member.name for member in guild.members])
         print(f'Guild Members:\n - {members}')
         print(guild.text_channels)
+
+        # Announce new features
+        global message_sent
+        channel = discord.utils.get(guild.text_channels, id=883484321804091415)
+        if channel and not message_sent:
+            message = "Hello! I'd like to announce some new features that have been added:\n\n" \
+                        "**Wordle User Statistics**: User stats for the daily wordle game will now be tracked. Use /stats to see your personal stats."
+            await channel.send(message)
+            message_sent = True
+
+            with open('announcement_status.txt', 'w') as f:
+                f.write('message_sent')
+        elif message_sent:
+            print("Message already sent")
+        else:
+            print("Channel not found")
+try:
+    with open('announcement_status.txt', 'r') as f:
+        status = f.read()
+        if status == 'message_sent':
+            message_sent = True
+except FileNotFoundError:
+    pass
 
 # Welcome Message
 @bot.event
@@ -324,9 +348,6 @@ async def stats(ctx):
         games_lost = sum(row[3] for row in rows if row[3] is not None)
         total_guesses = sum(row[4] for row in rows if row[4] is not None)
         await ctx.send(f"Games played: {games_played}, Games won: {games_won}, Games lost: {games_lost}, Guesses made: {total_guesses}, Win rate: {games_won/games_played:.2f}")
-
-
-
 
 
 bot.run(TOKEN)
