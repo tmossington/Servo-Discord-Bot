@@ -14,6 +14,9 @@ from uszipcode import SearchEngine
 import wordle
 import randomanswer
 import asyncio
+import wordle_db as db
+import datetime
+
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
@@ -25,6 +28,8 @@ intents = discord.Intents.all()
 intents.members = True
 
 bot = commands.Bot(command_prefix = '/', intents=intents)
+
+connection, cursor = db.connect_to_db()
 
 @bot.event
 async def on_ready():
@@ -90,6 +95,9 @@ async def on_message(message):
         if game.is_over():
             daily_game_active = False
             games.pop(message.channel.id)
+            # Update user stats
+            user_id = str(message.author.id)
+            db.update_user_stats(connection, cursor, user_id, game.guessed_correctly, game.guesses_made)
 
 
     await bot.process_commands(message)
@@ -294,7 +302,31 @@ async def wordle_day(ctx):
         await member.create_dm()
         games[member.dm_channel.id] = game
         await member.dm_channel.send("New game started! Type your guess below.")
+
+    # Check if game is won
+    guessed_correctly = game.guessed_correctly
+    if guessed_correctly == True:
+        game_won = True
+    else:
+        game_won = False
+
     
+    
+@bot.command()
+async def stats(ctx):
+    user_id = str(ctx.author.id)
+    rows = db.get_user_stats(cursor, user_id)
+    if not rows:
+        await ctx.send("No stats found.")
+    else:
+        games_played = sum(row[1] for row in rows if row[1] is not None)
+        games_won = sum(row[2] for row in rows if row[2] is not None)
+        games_lost = sum(row[3] for row in rows if row[3] is not None)
+        total_guesses = sum(row[4] for row in rows if row[4] is not None)
+        await ctx.send(f"Games played: {games_played}, Games won: {games_won}, Games lost: {games_lost}, Guesses made: {total_guesses}, Win rate: {games_won/games_played:.2f}")
+
+
+
 
 
 bot.run(TOKEN)
