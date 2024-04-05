@@ -164,9 +164,9 @@ class Wordle:
             self.guesses = 0
             #game = None
             if self.guesses_made == 1:
-                return f"Congratulations! You have guessed the word in {self.guesses_made} attempt. The game is over. {self.guessed_correctly}"
+                return f"{self.guessed_correctly}! You have guessed the word in {self.guesses_made} attempt. The game is over."
             else:
-                return f"Congratulations! You have guessed the word in {self.guesses_made} attempts. The game is over. {self.guessed_correctly}"
+                return f"{self.guessed_correctly}! You have guessed the word in {self.guesses_made} attempts. The game is over."
         elif guess != self.word:
             self.guessed_correctly = False   
             if self.guesses == 0:
