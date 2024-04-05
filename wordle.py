@@ -9,6 +9,8 @@ class Wordle:
         self.word = word.upper()
         self.enforce_length = enforce_length
         self.real_word = real_word
+        self.guessed_correctly = False
+        self.guesses_made = 0
         if random_daily:
             self.word = randomanswer.daily_random_word(daily=True).upper()
 
@@ -152,21 +154,21 @@ class Wordle:
         if log_guess:
             if self.guesses != 0:
                 self.guesses -= 1
-
-        guesses_left = (f"{self.guesses}")
-        guesses_made = 6 - self.guesses
+                guesses_left = (f"{self.guesses}")
+                self.guesses_made = 6 - self.guesses
+        
 
 
         if guess == self.word:
-            guessed_correctly = True
+            self.guessed_correctly = True
             self.guesses = 0
             #game = None
-            if guesses_made == 1:
-                return f"Congratulations! You have guessed the word in {guesses_made} attempt. The game is over."
+            if self.guesses_made == 1:
+                return f"Congratulations! You have guessed the word in {self.guesses_made} attempt. The game is over. {self.guessed_correctly}"
             else:
-                return f"Congratulations! You have guessed the word in {guesses_made} attempts. The game is over."
-        elif guess != self.word:  
-            guessed_correctly = False   
+                return f"Congratulations! You have guessed the word in {self.guesses_made} attempts. The game is over. {self.guessed_correctly}"
+        elif guess != self.word:
+            self.guessed_correctly = False   
             if self.guesses == 0:
                 return f"You have run out of guesses, the word was {self.word}."
             else:
@@ -182,4 +184,5 @@ class Wordle:
     def is_over(self):
         if self.guesses == 0:
             return True
+
         
