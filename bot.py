@@ -5,7 +5,7 @@ import random
 from discord.ext import commands
 from discord import app_commands
 from discord.ext.commands import Bot
-import interactions
+#import interactions
 from discord import Intents
 import config
 import random
