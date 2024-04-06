@@ -31,7 +31,9 @@ def connect_to_db():
 
             cursor = connection.cursor()
             cursor.execute("CREATE DATABASE IF NOT EXISTS wordle_stats")
-            cursor.execute("USE wordle_stats")
+            connection.commit() # Commit the changes
+
+            connection.database = "wordle_stats"
             cursor.execute("CREATE TABLE IF NOT EXISTS user_stats (user_id VARCHAR(255), games_played INT DEFAULT 0, total_guesses INT DEFAULT 0, games_won INT DEFAULT 0, games_lost INT DEFAULT 0, last_played DATE, PRIMARY KEY (user_id))")
     except Error as e:
         print("Error while connecting to MySQL", e)
