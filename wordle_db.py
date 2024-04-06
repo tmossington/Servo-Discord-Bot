@@ -1,7 +1,7 @@
 # wordle_db.py
 import mysql.connector
 from mysql.connector import Error
-import datetime
+from datetime import datetime
 import os
 from dotenv import load_dotenv
 
