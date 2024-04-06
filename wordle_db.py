@@ -35,6 +35,7 @@ def connect_to_db():
 
             connection.database = "wordle_stats"
             cursor.execute("CREATE TABLE IF NOT EXISTS user_stats (user_id VARCHAR(255), games_played INT DEFAULT 0, total_guesses INT DEFAULT 0, games_won INT DEFAULT 0, games_lost INT DEFAULT 0, last_played DATE, PRIMARY KEY (user_id))")
+            connection.commit()  # Commit the changes
     except Error as e:
         print("Error while connecting to MySQL", e)
 
@@ -53,7 +54,7 @@ def update_user_stats(connection, cursor, user_id, game_won, num_guesses):
     else:
      # Otherwise, update the existing row
         games_played, games_won, games_lost, total_guesses, last_played = row
-        if last_played.date() < current_date:
+        if last_played < current_date:
             games_played = 0 if games_played is None else games_played
             games_won = 0 if games_won is None else games_won
             games_lost = 0 if games_lost is None else games_lost
@@ -78,7 +79,8 @@ def reset_database(connection, cursor):
                    games_played INT DEFAULT 0,
                    games_won INT DEFAULT 0,
                    games_lost INT DEFAULT 0,
-                   total_guesses INT DEFAULT 0
+                   total_guesses INT DEFAULT 0,
+                   last_played DATE
                      )
                      ''')
     
