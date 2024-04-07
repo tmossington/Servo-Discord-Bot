@@ -53,7 +53,7 @@ async def on_ready():
 
         # Announce new features
         global message_sent
-        channel = discord.utils.get(guild.text_channels, id=1059619616814547117)
+        channel = discord.utils.get(guild.text_channels, id=883484321804091415)
         if channel and not message_sent:
             message = "Hello! I'd like to announce some new features that have been added:\n\n" \
                         "**Help function**: Use /help to see a list of all available bot commands.\n" \
