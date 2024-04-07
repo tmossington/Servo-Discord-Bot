@@ -347,9 +347,12 @@ async def wordle_day(ctx):
     
     
 @bot.command(help="Returns user stats for the daily wordle game")
-async def stats(ctx, user):
+async def stats(ctx, user=None):
     rows = None
-    if re.match('<@\d+>', user):
+    if user is None:
+        user_id = ctx.author.id
+        rows = db.get_user_stats(cursor, user_id=user_id)
+    elif re.match('<@\d+>', user):
         user_id = int(re.sub('\D', '', user)) # If the user argument is a mention
         print(user_id)
         rows = db.get_user_stats(cursor, user_id=user_id)
