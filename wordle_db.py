@@ -34,7 +34,7 @@ def connect_to_db():
             connection.commit() # Commit the changes
 
             connection.database = "wordle_stats"
-            cursor.execute("CREATE TABLE IF NOT EXISTS user_stats (user_id VARCHAR(255), games_played INT DEFAULT 0, total_guesses INT DEFAULT 0, games_won INT DEFAULT 0, games_lost INT DEFAULT 0, average_guesses_per_game INT DEFAULT 0, last_played DATE, PRIMARY KEY (user_id))")
+            cursor.execute("CREATE TABLE IF NOT EXISTS user_stats (user_id VARCHAR(255), username VARCHAR(255), games_played INT DEFAULT 0, total_guesses INT DEFAULT 0, games_won INT DEFAULT 0, games_lost INT DEFAULT 0, average_guesses_per_game INT DEFAULT 0, last_played DATE, PRIMARY KEY (user_id))")
             connection.commit()  # Commit the changes
     except Error as e:
         print("Error while connecting to MySQL", e)
@@ -42,25 +42,26 @@ def connect_to_db():
     return connection, cursor
 
 
-def update_user_stats(connection, cursor, user_id, game_won, num_guesses):
+def update_user_stats(connection, cursor, user_id, username, game_won, num_guesses):
     # Update the user stats in the database
-    cursor.execute('SELECT games_played, games_won, games_lost, total_guesses, average_guesses_per_game, last_played FROM user_stats WHERE user_id = %s', (user_id,))
+    cursor.execute('SELECT username, games_played, games_won, games_lost, total_guesses, average_guesses_per_game, last_played FROM user_stats WHERE user_id = %s', (user_id,))
     row = cursor.fetchone()
     current_date = datetime.now().date()
 
     # If the user has no stats yet, insert a new row
     if row is None:
-        cursor.execute('INSERT INTO user_stats (user_id, games_played, games_won, games_lost, total_guesses, average_guesses_per_game, last_played) VALUES (%s, 1, %s, %s, %s, %s, %s)', (user_id, int(game_won), int(not game_won), num_guesses, num_guesses, current_date))
+        cursor.execute('INSERT INTO user_stats (user_id, username, games_played, games_won, games_lost, total_guesses, average_guesses_per_game, last_played) VALUES (%s, %s, 1, %s, %s, %s, %s, %s)', (user_id, username, int(game_won), int(not game_won), num_guesses, num_guesses, current_date))
     else:
      # Otherwise, update the existing row
-        games_played, games_won, games_lost, total_guesses, average_guesses_per_game, last_played = row
+        username, games_played, games_won, games_lost, total_guesses, average_guesses_per_game, last_played = row
         if last_played < current_date:
+            username = username
             games_played = 0 if games_played is None else games_played
             games_won = 0 if games_won is None else games_won
             games_lost = 0 if games_lost is None else games_lost
             total_guesses = 0 if total_guesses is None else total_guesses
             average_guesses_per_game = 0 if average_guesses_per_game is None else average_guesses_per_game
-            cursor.execute('UPDATE user_stats SET games_played = %s, games_won = %s, games_lost = %s, total_guesses = %s, average_guesses_per_game = %s, last_played = %s WHERE user_id = %s', (games_played + 1, games_won + int(game_won), games_lost + int(not game_won), total_guesses + num_guesses,int(num_guesses/games_played), current_date, user_id))
+            cursor.execute('UPDATE user_stats SET username = %s, games_played = %s, games_won = %s, games_lost = %s, total_guesses = %s, average_guesses_per_game = %s, last_played = %s WHERE user_id = %s', (username, games_played + 1, games_won + int(game_won), games_lost + int(not game_won), total_guesses + num_guesses,int(num_guesses/games_played), current_date, user_id))
 
     # Commit the changes
     connection.commit()
@@ -77,6 +78,7 @@ def reset_database(connection, cursor):
     cursor.execute('''
                    CREATE TABLE IF NOT EXISTS user_stats (
                    user_id VARCHAR(255) PRIMARY KEY,
+                   username VARCHAR(255),
                    games_played INT DEFAULT 0,
                    games_won INT DEFAULT 0,
                    games_lost INT DEFAULT 0,

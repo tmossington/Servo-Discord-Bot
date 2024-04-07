@@ -129,7 +129,8 @@ async def on_message(message):
             games.pop(message.channel.id)
             # Update user stats
             user_id = str(message.author.id)
-            db.update_user_stats(connection, cursor, user_id, game.guessed_correctly, game.guesses_made)
+            username = str(message.author)
+            db.update_user_stats(connection, cursor, user_id, username, game.guessed_correctly, game.guesses_made)
 
 
     await bot.process_commands(message)
@@ -351,12 +352,14 @@ async def stats(ctx):
     if not rows:
         await ctx.send("No stats found.")
     else:
-        games_played = sum(row[1] for row in rows if row[1] is not None)
-        games_won = sum(row[2] for row in rows if row[2] is not None)
-        games_lost = sum(row[3] for row in rows if row[3] is not None)
-        total_guesses = sum(row[4] for row in rows if row[4] is not None)
-        average_guesses_per_game = sum(row[5] for row in rows if row[5] is not None)
-        await ctx.send(f"Games played: {games_played}, Games won: {games_won}, Games lost: {games_lost}, Guesses made: {total_guesses}, Average guesses per game: {average_guesses_per_game}, Win rate: {games_won/games_played:.2f}")
+        first_row = rows[0]
+        username = first_row[1]
+        games_played = sum(row[2] for row in rows if row[2] is not None)
+        games_won = sum(row[3] for row in rows if row[3] is not None)
+        games_lost = sum(row[4] for row in rows if row[4] is not None)
+        total_guesses = sum(row[5] for row in rows if row[5] is not None)
+        average_guesses_per_game = sum(row[6] for row in rows if row[6] is not None)
+        await ctx.send(f"Username: {username}, Games played: {games_played}, Games won: {games_won}, Games lost: {games_lost}, Guesses made: {total_guesses}, Average guesses per game: {average_guesses_per_game}, Win rate: {games_won/games_played:.2f}")
 
 
 
