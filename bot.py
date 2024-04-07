@@ -16,6 +16,7 @@ import randomanswer
 import asyncio
 import wordle_db as db
 import datetime
+import capital_game
 
 
 load_dotenv()
@@ -350,5 +351,25 @@ async def stats(ctx):
         average_guesses_per_game = sum(row[5] for row in rows if row[5] is not None)
         await ctx.send(f"Games played: {games_played}, Games won: {games_won}, Games lost: {games_lost}, Guesses made: {total_guesses}, Average guesses per game: {average_guesses_per_game}, Win rate: {games_won/games_played:.2f}")
 
+
+
+@bot.command()
+async def capital(ctx):
+    country = random.choice(list(capital_game.country_capitals.keys()))
+    capital = capital_game.country_capitals[country]
+    await ctx.send(f"What is the capital of {country}?")
+
+    def check(m):
+        return m.author == ctx.author and m.channel == ctx.channel
+
+    try:
+        guess = await bot.wait_for('message', check=check, timeout=60.0)
+    except asyncio.TimeoutError:
+        await ctx.send(f"Time's up! The correct answer was {capital}")
+    else:
+        if guess.content.lower() == capital.lower():
+            await ctx.send("Correct!")
+        else:
+            await ctx.send(f"Wrong! The correct answer was {capital}")
 
 bot.run(TOKEN)

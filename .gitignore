@@ -7,3 +7,4 @@ command.py
 new_dict.txt
 dict_decode.py
 __pycache__/wordle_db.cpython-310.pyc
+__pycache__/capital_game.cpython-310.pyc
