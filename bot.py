@@ -28,7 +28,13 @@ intents = discord.Intents.all()
 
 intents.members = True
 
-bot = commands.Bot(command_prefix = '/', intents=intents)
+help_command = commands.DefaultHelpCommand(
+    no_category = 'Commands'
+)
+
+bot = commands.Bot(command_prefix = '/', intents=intents, help_command = help_command)
+
+
 
 connection, cursor = db.connect_to_db()
 message_sent = False
@@ -128,7 +134,7 @@ async def on_message(message):
     await bot.process_commands(message)
 
 # Random Number Generator
-@bot.command()
+@bot.command(help="Generates a random number between 0 and 10^10")
 async def number(ctx):
     random_num = random.uniform(0, 10**10)
 
@@ -136,7 +142,7 @@ async def number(ctx):
 
 
 #Weather Command
-@bot.command()
+@bot.command(help="Returns the current weather for a specified location")
 async def weather(ctx, *, location):
     
     # Check if the input is a valid zip code
@@ -192,7 +198,7 @@ async def weather(ctx, *, location):
         
 
 # Financial Report using Tiingo API
-@bot.command()
+@bot.command(help="Returns the current price of a stock symbol")
 async def price(ctx, *, symbol):
     stockAPI_Key = os.getenv('tiingo_API')
     url = f'https://api.tiingo.com/iex/{symbol}?token={stockAPI_Key}'
@@ -229,7 +235,7 @@ async def price(ctx, *, symbol):
         await ctx.send("Invalid response format.")
 
 
-@bot.command()
+@bot.command(help="Returns the current price of a cryptocurrency")
 async def crypto(ctx, *, symbol):
     stockAPI_Key = os.getenv('tiingo_API')
     #url = f'https://api.tiingo.com/tiingo/crypto/prices?tickers={symbol}&token={stockAPI_Key}'
@@ -281,7 +287,7 @@ async def crypto(ctx, *, symbol):
 
 game = None
 games = {}
-@bot.command()
+@bot.command(help="Play a game of wordle. Guess the word in 6 tries or less.")
 async def wordle(ctx, guess: str):
     #global game
     import wordle
@@ -299,7 +305,7 @@ async def wordle(ctx, guess: str):
     print(response)
     await ctx.send(response)
 
-@bot.command()
+@bot.command(help="Starts a new game of wordle")
 async def new_wordle(ctx):
     import wordle
     #global game
@@ -310,7 +316,7 @@ async def new_wordle(ctx):
 
 daily_game_active = False
 
-@bot.command()
+@bot.command(help="Play the wordle of the day. Guess the word in 6 tries or less.")
 async def wordle_day(ctx):
     member = ctx.author
     #global game
@@ -337,7 +343,7 @@ async def wordle_day(ctx):
 
     
     
-@bot.command()
+@bot.command(help="Returns user stats for the daily wordle game")
 async def stats(ctx):
     user_id = str(ctx.author.id)
     rows = db.get_user_stats(cursor, user_id)
@@ -353,7 +359,7 @@ async def stats(ctx):
 
 
 
-@bot.command()
+@bot.command(help="Play a game of guessing the capital of a country")
 async def capital(ctx):
     country = random.choice(list(capital_game.country_capitals.keys()))
     capital = capital_game.country_capitals[country]
