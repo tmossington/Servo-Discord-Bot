@@ -18,6 +18,7 @@ import wordle_db as db
 import datetime
 import capital_game
 import re
+from discord.ext import tasks
 
 
 load_dotenv()
@@ -43,6 +44,8 @@ message_sent = False
 @bot.event
 async def on_ready():
     print(f'{bot.user} has connected to Discord')
+    morning_report.start()
+
     for guild in bot.guilds:
         #if guild.name == GUILD:
          #   break
@@ -143,11 +146,7 @@ async def number(ctx):
 
     await ctx.send(f"Random number: {random_num}")
 
-
-#Weather Command
-@bot.command(help="Returns the current weather for a specified location")
-async def weather(ctx, *, location, send_message=True):
-    
+async def fetch_weather(location):
     # Check if the input is a valid zip code
     search = SearchEngine()
     zipcode_data = search.by_zipcode(location)
@@ -159,7 +158,7 @@ async def weather(ctx, *, location, send_message=True):
         location = location + ',us'
     else:
         # If not a valid zip code, use the input as a city name
-        location = location
+        location = location + ',us'
         state = ""
     
     WeatherAPI_Key  = '9f7181e1f2bfd3070530d4b905ed5ef8'
@@ -193,15 +192,13 @@ async def weather(ctx, *, location, send_message=True):
         sys = data['sys']
         country = sys['country']
     
-    # Send weather data in discord chat
+    return f"{name}, {state}, {country}: {temp}°F, {conditions}" 
 
-    if send_message:
-        if state:
-            await ctx.send(f"{name}, {state}, {country}: {temp}°F, {conditions}")
-        else:
-            await ctx.send(f"{name}, {country}: {temp}°F, {conditions}")
-    return f"{temp}°F, {conditions}"        
-
+#Weather Command
+@bot.command(help="Returns the current weather for a specified location")
+async def weather(ctx, *, location):
+    weather_report = await fetch_weather(location)
+    await ctx.send(weather_report)
 
 # Financial Report using Tiingo API
 @bot.command(help="Returns the current price of a stock symbol")
@@ -409,5 +406,18 @@ async def capital(ctx):
 async def announce(ctx, *, message):
     channel = bot.get_channel(883484321804091415)
     await channel.send(message)
+
+@tasks.loop(minutes=1.0)
+async def morning_report():
+    if datetime.datetime.now().hour == 19 and datetime.datetime.now().minute == 24:
+        channel = bot.get_channel(1059619616814547117)
+        weather_report_VA = await fetch_weather('22201')
+        weather_report_MI = await fetch_weather('48089')
+
+        await channel.send(f"Good morning! Here is the morning report: \n\nWeather: \n"
+                        f"Arlington, VA: {weather_report_VA}\n"
+                        f"Warren, MI: {weather_report_MI}\n\n"
+                        f"Have a great day!")
+        
 
 bot.run(TOKEN)
