@@ -375,6 +375,14 @@ async def stats(ctx, user=None):
 
 
 
+@bot.command(help="Returns the list of all user stats for the daily wordle game")
+async def stat_report(ctx):
+    cursor.execute('SELECT * FROM user_stats')
+    rows = cursor.fetchall()
+    for row in rows:
+        user_id, username, games_played, games_won, games_lost, total_guesses, average_guesses_per_game, last_played = row
+        await ctx.send(f"Username: {username}, Games played: {games_played}, Games won: {games_won}, Games lost: {games_lost}, Total guesses: {total_guesses}, Average guesses per game: {average_guesses_per_game}")
+
 @bot.command(help="Play a game of guessing the capital of a country")
 async def capital(ctx):
     country = random.choice(list(capital_game.country_capitals.keys()))
