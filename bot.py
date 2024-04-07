@@ -17,6 +17,7 @@ import asyncio
 import wordle_db as db
 import datetime
 import capital_game
+import re
 
 
 load_dotenv()
@@ -346,9 +347,17 @@ async def wordle_day(ctx):
     
     
 @bot.command(help="Returns user stats for the daily wordle game")
-async def stats(ctx):
-    user_id = str(ctx.author.id)
-    rows = db.get_user_stats(cursor, user_id)
+async def stats(ctx, user):
+    rows = None
+    if re.match('<@\d+>', user):
+        user_id = int(re.sub('\D', '', user)) # If the user argument is a mention
+        print(user_id)
+        rows = db.get_user_stats(cursor, user_id=user_id)
+    elif user.isdigit():
+        rows = db.get_user_stats(cursor, user_id=int(user)) # If the user argument is a user ID
+    else:
+        rows = db.get_user_stats(cursor, username=user) # If the user argument is a username
+
     if not rows:
         await ctx.send("No stats found.")
     else:
@@ -381,5 +390,10 @@ async def capital(ctx):
             await ctx.send("Correct!")
         else:
             await ctx.send(f"Wrong! The correct answer was {capital}")
+
+@bot.command()
+async def announce(ctx, *, message):
+    channel = bot.get_channel(883484321804091415)
+    await channel.send(message)
 
 bot.run(TOKEN)

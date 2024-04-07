@@ -66,8 +66,17 @@ def update_user_stats(connection, cursor, user_id, username, game_won, num_guess
     # Commit the changes
     connection.commit()
 
-def get_user_stats(cursor, user_id):
-    cursor.execute('SELECT * FROM user_stats WHERE user_id = %s', (user_id,))
+def get_user_stats(cursor, **kwargs):
+    user_id = kwargs.get('user_id', None)
+    username = kwargs.get('username', None)
+    
+
+    if user_id is not None and isinstance(user_id, int):
+        cursor.execute('SELECT * FROM user_stats WHERE user_id = %s', (user_id,))
+    elif username is not None and isinstance(username, str):
+        cursor.execute('SELECT * FROM user_stats WHERE username = %s', (username,))
+    else:
+        return None
     return cursor.fetchall()
 
 def reset_database(connection, cursor):
