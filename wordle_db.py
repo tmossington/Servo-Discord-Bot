@@ -91,9 +91,9 @@ def reset_database(connection, cursor):
     # Commit the changes
     connection.commit()
 
-connection, cursor = connect_to_db()
+#connection, cursor = connect_to_db()
 
-reset_database(connection, cursor)
+#reset_database(connection, cursor)
 
 
 
