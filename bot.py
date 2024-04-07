@@ -347,7 +347,8 @@ async def stats(ctx):
         games_won = sum(row[2] for row in rows if row[2] is not None)
         games_lost = sum(row[3] for row in rows if row[3] is not None)
         total_guesses = sum(row[4] for row in rows if row[4] is not None)
-        await ctx.send(f"Games played: {games_played}, Games won: {games_won}, Games lost: {games_lost}, Guesses made: {total_guesses}, Win rate: {games_won/games_played:.2f}")
+        average_guesses_per_game = sum(row[5] for row in rows if row[5] is not None)
+        await ctx.send(f"Games played: {games_played}, Games won: {games_won}, Games lost: {games_lost}, Guesses made: {total_guesses}, Average guesses per game: {average_guesses_per_game}, Win rate: {games_won/games_played:.2f}")
 
 
 bot.run(TOKEN)
