@@ -146,7 +146,7 @@ async def number(ctx):
 
 #Weather Command
 @bot.command(help="Returns the current weather for a specified location")
-async def weather(ctx, *, location):
+async def weather(ctx, *, location, send_message=True):
     
     # Check if the input is a valid zip code
     search = SearchEngine()
@@ -156,7 +156,7 @@ async def weather(ctx, *, location):
         # If a valid zip code, use it directly
         city = zipcode_data.major_city
         state = zipcode_data.state
-        location = f"{city}"
+        location = location + ',us'
     else:
         # If not a valid zip code, use the input as a city name
         location = location
@@ -194,11 +194,14 @@ async def weather(ctx, *, location):
         country = sys['country']
     
     # Send weather data in discord chat
-    if state:
-        await ctx.send(f"{name}, {state}, {country}: {temp}°F, {conditions}")
-    else:
-        await ctx.send(f"{name}, {country}: {temp}°F, {conditions}")
-        
+
+    if send_message:
+        if state:
+            await ctx.send(f"{name}, {state}, {country}: {temp}°F, {conditions}")
+        else:
+            await ctx.send(f"{name}, {country}: {temp}°F, {conditions}")
+    return f"{temp}°F, {conditions}"        
+
 
 # Financial Report using Tiingo API
 @bot.command(help="Returns the current price of a stock symbol")
