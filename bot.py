@@ -165,7 +165,7 @@ async def fetch_weather(location):
         location = location + ',us'
         state = ""
     
-    WeatherAPI_Key  = '9f7181e1f2bfd3070530d4b905ed5ef8'
+    WeatherAPI_Key  = os.getenv('WeatherAPI_Key')
     url = f'https://api.openweathermap.org/data/2.5/weather?q={location}&appid={WeatherAPI_Key}&units=imperial'
 
 
@@ -179,8 +179,7 @@ async def fetch_weather(location):
     # Check if location is valid
     if 'message' in data:
         error_message = data['message']
-        await ctx.send(f"Error: {error_message}")
-        return
+        return error_message
     
     # Extract weather information
     for weather_data in data:
