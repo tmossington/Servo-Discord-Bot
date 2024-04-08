@@ -22,6 +22,7 @@ import re
 from discord.ext import tasks
 from github import Github
 import banned_words
+import pytz
 
 
 load_dotenv()
@@ -464,7 +465,10 @@ async def fetch_nyt(ctx):
 @tasks.loop(minutes=1.0)
 async def morning_report():
     # Verify correct time to report
-    if datetime.now().hour == 8 and datetime.now().minute == 0:
+    eastern = pytz.timezone('US/Eastern')
+    current_time = datetime.now(eastern)
+
+    if current_time.hour == 9 and current_time.minute == 0:
         # Perform all data collection jobs for the report
         # Get the channel to send the report
         channel = bot.get_channel(883484321804091415)
