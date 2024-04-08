@@ -412,7 +412,7 @@ async def announce(ctx, *, message):
 
 
 cooldowns = {}
-@bot.command()
+@bot.command(help="Submit a suggestion for the bot to the github page")
 async def suggest(ctx, *, suggestion):
     GITHUB_TOKEN = os.getenv('GITHUB_TOKEN')
     REPO_NAME = 'tmossington/Servo-Discord-Bot'
