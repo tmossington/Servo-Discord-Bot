@@ -464,10 +464,10 @@ async def fetch_nyt(ctx):
 @tasks.loop(minutes=1.0)
 async def morning_report():
     # Verify correct time to report
-    if datetime.now().hour == 0 and datetime.now().minute == 56:
+    if datetime.now().hour == 8 and datetime.now().minute == 0:
         # Perform all data collection jobs for the report
         # Get the channel to send the report
-        channel = bot.get_channel(1059619616814547117)
+        channel = bot.get_channel(883484321804091415)
         # Get the weather report for Arlington, VA and Warren, MI
         weather_report_VA = await fetch_weather('22201')
         weather_report_MI = await fetch_weather('48089')
