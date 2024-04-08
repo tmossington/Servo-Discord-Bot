@@ -15,10 +15,13 @@ import wordle
 import randomanswer
 import asyncio
 import wordle_db as db
-import datetime
+
+from datetime import datetime, timedelta
 import capital_game
 import re
 from discord.ext import tasks
+from github import Github
+import banned_words
 
 
 load_dotenv()
@@ -408,6 +411,35 @@ async def announce(ctx, *, message):
     await channel.send(message)
 
 
+cooldowns = {}
+@bot.command()
+async def suggest(ctx, *, suggestion):
+    GITHUB_TOKEN = os.getenv('GITHUB_TOKEN')
+    REPO_NAME = 'tmossington/Servo-Discord-Bot'
+    COOLDOWN = timedelta(hours=1)
+
+
+    if ctx.author.id in cooldowns and datetime.now() < cooldowns[ctx.author.id]:
+        await ctx.send("You are on cooldown. Please wait before submitting another suggestion.")
+        return
+    
+    if any(banned_word in suggestion.lower() for banned_word in banned_words.BANNED_WORDS):
+        await ctx.send("Sorry, your suggestion contains inappropriate language.")
+        cooldowns[ctx.author.id] = datetime.now() + COOLDOWN
+        return
+
+    g = Github(GITHUB_TOKEN)
+    repo = g.get_repo(REPO_NAME)
+
+    # Create a new issue
+    issue = repo.create_issue(
+        title=f"Issue from {ctx.author.name}",
+        body=suggestion
+    )
+    await ctx.send(f"Issue created: {issue.html_url}")
+
+
+
 
 ### NYT API
 async def fetch_nyt(ctx):
@@ -427,13 +459,15 @@ async def fetch_nyt(ctx):
 
 
 
+
+
 @tasks.loop(minutes=1.0)
 async def morning_report():
     # Verify correct time to report
-    if datetime.datetime.now().hour == 8 and datetime.datetime.now().minute == 0:
+    if datetime.now().hour == 0 and datetime.now().minute == 56:
         # Perform all data collection jobs for the report
         # Get the channel to send the report
-        channel = bot.get_channel(883484321804091415)
+        channel = bot.get_channel(1059619616814547117)
         # Get the weather report for Arlington, VA and Warren, MI
         weather_report_VA = await fetch_weather('22201')
         weather_report_MI = await fetch_weather('48089')
