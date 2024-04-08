@@ -407,17 +407,45 @@ async def announce(ctx, *, message):
     channel = bot.get_channel(883484321804091415)
     await channel.send(message)
 
+
+
+### NYT API
+async def fetch_nyt(ctx):
+    NYT_API_KEY = os.getenv('NYT_API')
+    url = f'https://api.nytimes.com/svc/topstories/v2/home.json?api-key={NYT_API_KEY}'
+    response = requests.get(url)
+    data = response.json()
+    
+    top_stories = data['results'][:5]
+
+    stories_text = ""
+    for story in top_stories:
+        title = story['title']
+        url = story['url']
+        stories_text += f"{title}: <{url}>\n"
+    return stories_text
+
+
+
 @tasks.loop(minutes=1.0)
 async def morning_report():
-    if datetime.datetime.now().hour == 19 and datetime.datetime.now().minute == 24:
-        channel = bot.get_channel(1059619616814547117)
+    # Verify correct time to report
+    if datetime.datetime.now().hour == 8 and datetime.datetime.now().minute == 0:
+        # Perform all data collection jobs for the report
+        # Get the channel to send the report
+        channel = bot.get_channel(883484321804091415)
+        # Get the weather report for Arlington, VA and Warren, MI
         weather_report_VA = await fetch_weather('22201')
         weather_report_MI = await fetch_weather('48089')
+
+        # News report
+        headlines = await fetch_nyt(channel)
 
         await channel.send(f"Good morning! Here is the morning report: \n\nWeather: \n"
                         f"Arlington, VA: {weather_report_VA}\n"
                         f"Warren, MI: {weather_report_MI}\n\n"
+                        f"Top News Headlines: \n{headlines}\n\n"
+
                         f"Have a great day!")
-        
 
 bot.run(TOKEN)
