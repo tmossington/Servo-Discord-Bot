@@ -383,7 +383,7 @@ async def stat_report(ctx):
     cursor.execute('SELECT * FROM user_stats')
     rows = cursor.fetchall()
     for row in rows:
-        user_id, username, games_played, games_won, games_lost, total_guesses, average_guesses_per_game, last_played = row
+        user_id, username, games_played, total_guesses, games_won, games_lost, average_guesses_per_game, last_played = row
         await ctx.send(f"Username: {username}, Games played: {games_played}, Games won: {games_won}, Games lost: {games_lost}, Total guesses: {total_guesses}, Average guesses per game: {average_guesses_per_game}")
 
 @bot.command(help="Play a game of guessing the capital of a country")
