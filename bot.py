@@ -407,6 +407,10 @@ async def capital(ctx):
 
 @bot.command()
 async def announce(ctx, *, message):
+    my_id = os.getenv('discord_id')
+    if str(ctx.author.id) != my_id:
+        await ctx.send("You do not have permission to use this command.")
+        return
     channel = bot.get_channel(883484321804091415)
     await channel.send(message)
 
