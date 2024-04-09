@@ -10,3 +10,5 @@ __pycache__/wordle_db.cpython-310.pyc
 __pycache__/capital_game.cpython-310.pyc
 banned_words.py
 __pycache__/banned_words.cpython-310.pyc
+__pycache__/LevelingSystem.cpython-310.pyc
+__pycache__/levels.cpython-310.pyc

@@ -45,16 +45,26 @@ class LevelingSystem(commands.Cog):
         self.user_xp[user_id] = xp + random.randint(10, 20)
 
         # Level up user if they have enough XP
-        if self.user_level >= level**2 * 100:
+        if self.user_xp[user_id] >= level**2 * 100:
             self.user_level[user_id] = level + 1
             await message.channel.send(f"Congrats {message.author.mention}! You have leveled up to level {level + 1}!")
 
-    @commands.command(name= 'level')
+    @commands.command()
     async def level(self, ctx, member: discord.Member = None):
         member = member or ctx.author
         user_id = member.id
         level = self.user_level.get(user_id, 1)
+        await ctx.send(f'{member.mention} is at level {level}!')
+
+    @commands.command()
+    async def leaderboard(self, ctx):
+        sorted_users = sorted(self.user_level, key=lambda x: self.user_level[x], reverse=True)
+        leaderboard = 'Leaderboard\n'
+        for idx, user_id in enumerate(sorted_users):
+            leaderboard += f'{idx+1}. <@{user_id}>: Level {self.user_level[user_id]}\n'
+        await ctx.send(leaderboard)
+    
         
 
-def setup(bot):
-    bot.add_cog(LevelingSystem(bot))
+async def setup(bot):
+    await bot.add_cog(LevelingSystem(bot))
