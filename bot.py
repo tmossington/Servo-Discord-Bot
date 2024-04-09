@@ -40,7 +40,7 @@ help_command = commands.DefaultHelpCommand(
 
 bot = commands.Bot(command_prefix = '/', intents=intents, help_command = help_command)
 
-
+bot.loadextension=('levels')
 
 connection, cursor = db.connect_to_db()
 message_sent = False
@@ -411,32 +411,31 @@ async def announce(ctx, *, message):
     await channel.send(message)
 
 
-cooldowns = {}
-@bot.command(help="Submit a suggestion for the bot to the github page")
-async def suggest(ctx, *, suggestion):
-    GITHUB_TOKEN = os.getenv('GITHUB_TOKEN')
-    REPO_NAME = 'tmossington/Servo-Discord-Bot'
-    COOLDOWN = timedelta(hours=1)
+#cooldowns = {}
+#@bot.command(help="Submit a suggestion for the bot to the github page")
+#async def suggest(ctx, *, suggestion):
+ #   GITHUB_TOKEN = os.getenv('GITHUB_TOKEN')
+  #  REPO_NAME = 'tmossington/Servo-Discord-Bot'
+   # COOLDOWN = timedelta(hours=1)
 
 
-    if ctx.author.id in cooldowns and datetime.now() < cooldowns[ctx.author.id]:
-        await ctx.send("You are on cooldown. Please wait before submitting another suggestion.")
-        return
+   # if ctx.author.id in cooldowns and datetime.now() < cooldowns[ctx.author.id]:
+    #    await ctx.send("You are on cooldown. Please wait before submitting another suggestion.")
+     #   return
     
-    if any(banned_word in suggestion.lower() for banned_word in banned_words.BANNED_WORDS):
-        await ctx.send("Sorry, your suggestion contains inappropriate language.")
-        cooldowns[ctx.author.id] = datetime.now() + COOLDOWN
-        return
+    #if any(banned_word in suggestion.lower() for banned_word in banned_words.BANNED_WORDS):
+     #   await ctx.send("Sorry, your suggestion contains inappropriate language.")
+      ## return
 
-    g = Github(GITHUB_TOKEN)
-    repo = g.get_repo(REPO_NAME)
+    #g = Github(GITHUB_TOKEN)
+    #repo = g.get_repo(REPO_NAME)
 
     # Create a new issue
-    issue = repo.create_issue(
-        title=f"Issue from {ctx.author.name}",
-        body=suggestion
-    )
-    await ctx.send(f"Issue created: {issue.html_url}")
+    #issue = repo.create_issue(
+    #    title=f"Issue from {ctx.author.name}",
+    #    body=suggestion
+    #)
+    #await ctx.send(f"Issue created: {issue.html_url}")
 
 
 
@@ -458,16 +457,13 @@ async def fetch_nyt(ctx):
     return stories_text
 
 
-
-
-
 @tasks.loop(minutes=1.0)
 async def morning_report():
     # Verify correct time to report
     eastern = pytz.timezone('US/Eastern')
     current_time = datetime.now(eastern)
 
-    if current_time.hour == 9 and current_time.minute == 0:
+    if current_time.hour == 8 and current_time.minute == 0:
         # Perform all data collection jobs for the report
         # Get the channel to send the report
         channel = bot.get_channel(883484321804091415)
