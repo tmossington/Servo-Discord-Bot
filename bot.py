@@ -25,6 +25,7 @@ import banned_words
 import pytz
 
 
+
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 GUILD = os.getenv('DISCORD_GUILD')
@@ -40,7 +41,9 @@ help_command = commands.DefaultHelpCommand(
 
 bot = commands.Bot(command_prefix = '/', intents=intents, help_command = help_command)
 
-bot.loadextension=('levels')
+bot.load_extension(f'Cog.LevelingSystem[:-3]')
+
+#bot.load_extension=('levels')
 
 connection, cursor = db.connect_to_db()
 message_sent = False
@@ -59,29 +62,9 @@ async def on_ready():
         print(f'Guild Members:\n - {members}')
         print(guild.text_channels)
 
-        # Announce new features
-        global message_sent
-        channel = discord.utils.get(guild.text_channels, id=883484321804091415)
-        if channel and not message_sent:
-            message = "Hello! I'd like to announce some new features that have been added:\n\n" \
-                        "**Help function**: Use /help to see a list of all available bot commands.\n" \
-                        "**Wordle User Statistics**: User stats for the daily wordle game will now be tracked. Use /stats to see your personal stats."
-            await channel.send(message)
-            message_sent = True
+    await bot.load_extension('LevelingSystem')
+    print('LevelingSystem cog loaded')
 
-            with open('announcement_status.txt', 'w') as f:
-                f.write('message_sent')
-        elif message_sent:
-            print("Message already sent")
-        else:
-            print("Channel not found")
-try:
-    with open('announcement_status.txt', 'r') as f:
-        status = f.read()
-        if status == 'message_sent':
-            message_sent = True
-except FileNotFoundError:
-    pass
 
 # Welcome Message
 @bot.event
@@ -484,5 +467,14 @@ async def morning_report():
                         f"Top News Headlines: \n{headlines}\n\n"
 
                         f"Have a great day!")
+        
+@bot.command()
+async def reload_cog(ctx):
+    my_id = os.getenv('discord_id')
+    if str(ctx.author.id) != my_id:
+        await ctx.send("You do not have permission to use this command.")
+        return
+    bot.reload_extension('LevelingSystem')
+    await ctx.send("Cog reloaded.")
 
 bot.run(TOKEN)
