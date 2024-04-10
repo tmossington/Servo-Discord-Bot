@@ -469,12 +469,17 @@ async def morning_report():
                         f"Have a great day!")
         
 @bot.command()
-async def reload_cog(ctx):
+async def reload_cog(ctx, *, cog: str):
     my_id = os.getenv('discord_id')
     if str(ctx.author.id) != my_id:
         await ctx.send("You do not have permission to use this command.")
         return
-    bot.reload_extension('LevelingSystem')
-    await ctx.send("Cog reloaded.")
+    try:
+        bot.unload_extension(f"cogs.{cog}")
+        bot.load_extension(f"cogs.{cog}")
+    except Exception as e:
+        await ctx.send(f"**`ERROR:`** {type(e).__name__} - {e}")
+    else:
+        await ctx.send(f"**`SUCCESS:`** {cog} has been reloaded")
 
 bot.run(TOKEN)
