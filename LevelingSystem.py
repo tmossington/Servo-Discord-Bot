@@ -1,10 +1,13 @@
 # levels.py
+# Started 04/08/2024
 
 ## File for XP and leveling system for SERVO.
 
 import discord
 from discord.ext import commands
 import random
+import mysql.connector
+from mysql.connector import Error
 
 
 # Componenets:
@@ -25,32 +28,87 @@ class LevelingSystem(commands.Cog):
         self.bot = bot
         self.user_xp = {}
         self.user_level = {}
+        self.connection, self.cursor = self.connect_to_db()
+
+    def connect_to_db(self):
+        # Connect to MySQL Database
+        connection = None
+        cursor = None
+        try:
+            connection = mysql.connector.connect(
+                host = '127.0.0.1',
+                user = 'root',
+                password = 'CodyJean10',
+                database = 'rank_system'
+            )
+
+            if connection.is_connected():
+                db_info = connection.get_server_info()
+                print("Connect to MySQL Serer version ", db_info)
+
+                cursor = connection.cursor()
+                cursor.execute("CREATE DATABASE IF NOT EXISTS rank_system")
+                connection.commit() # Commit the new database
+
+                connection.database = "rank_system"
+                cursor.execute("CREATE TABLE IF NOT EXISTS user_levels (user_id VARCHAR(255), username VARCHAR(255), level INT DEFAULT 1, xp INT DEFAULT 0, PRIMARY KEY (user_id))")
+                connection.commit() # commit the new table
+        except Error as e:
+            print("Error while connecting to MySQL", e)
+        
+        return connection, cursor
+
+    async def update_user_stats(self, user_id, username, xp, level):
+        try:
+            self.cursor.execute("INSERT INTO user_levels (user_id, username, xp, level) VALUES (%s, %s, %s, %S) "
+                                "ON DUPLICATE KEY UPDATE xp = %s, level = %s",
+                                (user_id, username, xp, level, xp, level))
+            self.connection.commit()
+        except Error as e:
+            print("Error while update MySQL", e)
 
     @commands.Cog.listener()
     async def on_message(self, message):
         if message.author.bot:
             return
-        if message.guild is None:
+        if message.guild is None or message.guild.id != 1059619615950516334: #### REMOVE BEFORE DEPLOYMENT
             return
         
-        if message.author.id not in self.user_xp:
-            self.user_xp[message.author.id] = 0
-            self.user_level[message.author.id] = 0
-
         user_id = message.author.id
-        xp = self.user_xp.get(user_id, 0)
-        level = self.user_level.get(user_id, 1)
+        username = str(message.author)
 
-        # Give user random XP between 10 and 20
-        self.user_xp[user_id] = xp + random.randint(10, 20)
+        # Fetch user's current level and XP from database
+        self.cursor.execute("SELECT username, level, xp FROM user_levels WHERE user_id = %s", (user_id,))
+        result = self.cursor.fetchone()
+        if result:
+            username, level, xp = result
+        else:
+            # If user doesn't exist in database, initialize their level and XP
+            level = 1
+            xp = 0
+            self.cursor.execute("INSERT INTO user_levels (user_id, username, level, xp) VALUES (%s, %s, %s, %s)",
+                                (user_id, username, level, xp))
+            self.connection.commit()
 
-        # Level up user if they have enough XP
-        if self.user_xp[user_id] >= level**2 * 100:
-            self.user_level[user_id] = level + 1
-            await message.channel.send(f"Congrats {message.author.mention}! You have leveled up to level {level + 1}!")
+        # Give user random XP between 1 and 9
+        xp += random.randint(10, 25)
+
+        # Level up user when they reach enough XP
+        if xp >= level**2 * 100:
+            level += 1
+            await message.channel.send(f"Congrats {message.author.mention}! You have leveled up to level {level}!")
+
+        # Update the database with new level and XP
+        self.cursor.execute("UPDATE user_levels SET level = %s, xp = %s WHERE user_id = %s",
+                            (level, xp, user_id))
+        self.connection.commit()
+
+
 
     @commands.command()
     async def level(self, ctx, member: discord.Member = None):
+        if ctx.guild is None or ctx.guild.id != 1059619615950516334: ### REMOVE BEFORE DEPLOYMENT
+            return
         member = member or ctx.author
         user_id = member.id
         level = self.user_level.get(user_id, 1)
@@ -58,12 +116,38 @@ class LevelingSystem(commands.Cog):
 
     @commands.command()
     async def leaderboard(self, ctx):
+        if message.guild is None or message.guild.id != 1059619615950516334: ### REMOVE BEFORE DEPLOYMENT
+            return
         sorted_users = sorted(self.user_level, key=lambda x: self.user_level[x], reverse=True)
         leaderboard = 'Leaderboard\n'
-        for idx, user_id in enumerate(sorted_users):
+        for idx, user_id in enumerate(sorted_users[:10]):
             leaderboard += f'{idx+1}. <@{user_id}>: Level {self.user_level[user_id]}\n'
         await ctx.send(leaderboard)
     
+    # Reset user levels
+    @commands.command()
+    async def reset(self, ctx, member: discord.Member):
+        if message.guild is None or message.guild.id != 1059619615950516334: ### REMOVE BEFORE DEPLOYMENT
+            return
+        self.user_xp[member.id] = 0
+        self.user_level[member.id] = 1
+        await ctx.send(f"{member.mention} levels reset")
+
+    # Give level
+    @commands.command()
+    async def levelup(self, ctx, member:discord.Member, levels: int):
+        if message.guild is None or message.guild.id != 1059619615950516334: ### REMOVE BEFORE DEPLOYMENT
+            return
+        self.user_level[member.id] = int(self.user_level[member.id]) + levels
+        if levels == 1:
+            await ctx.send(f"{levels} level added to {member.mention}.")
+        else:
+            await ctx.send(f"{levels} levels added to {member.mention}.")
+
+
+    # Give XP
+
+
         
 
 async def setup(bot):
