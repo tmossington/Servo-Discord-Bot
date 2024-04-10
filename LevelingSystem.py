@@ -111,41 +111,85 @@ class LevelingSystem(commands.Cog):
             return
         member = member or ctx.author
         user_id = member.id
-        level = self.user_level.get(user_id, 1)
+        
+        # Fetch user's level from database
+        self.cursor.execute("SELECT level FROM user_levels WHERE user_id = %s", (user_id,))
+        result = self.cursor.fetchone()
+        if result:
+            level = result[0]
+        else:
+            level = 1 # Default level if user hasn't been added to database yet
+
+
         await ctx.send(f'{member.mention} is at level {level}!')
 
     @commands.command()
-    async def leaderboard(self, ctx):
-        if message.guild is None or message.guild.id != 1059619615950516334: ### REMOVE BEFORE DEPLOYMENT
+    async def leaderboard(self, ctx, limit: str = '10'):
+        if ctx.guild is None or ctx.guild.id != 1059619615950516334: ### REMOVE BEFORE DEPLOYMENT
             return
-        sorted_users = sorted(self.user_level, key=lambda x: self.user_level[x], reverse=True)
-        leaderboard = 'Leaderboard\n'
-        for idx, user_id in enumerate(sorted_users[:10]):
-            leaderboard += f'{idx+1}. <@{user_id}>: Level {self.user_level[user_id]}\n'
-        await ctx.send(leaderboard)
+        
+        # Fetch top 10 user's levels from database
+        if limit.lower() == 'all':
+            self.cursor.execute('SELECT * FROM user_levels ORDER BY level DESC, xp DESC')
+        else:
+            self.cursor.execute('SELECT * FROM user_levels ORDER BY level DESC, xp DESC LIMIT %s', (int(limit),))
+        rows = self.cursor.fetchall()
+        for row in rows:
+            user_id, username, level, xp = row
+            await ctx.send(f"Username: **{username}**, Level: {level}")
+
     
     # Reset user levels
     @commands.command()
     async def reset(self, ctx, member: discord.Member):
-        if message.guild is None or message.guild.id != 1059619615950516334: ### REMOVE BEFORE DEPLOYMENT
+        if ctx.guild is None or ctx.guild.id != 1059619615950516334: ### REMOVE BEFORE DEPLOYMENT
             return
-        self.user_xp[member.id] = 0
-        self.user_level[member.id] = 1
+        
+        member = member or ctx.author
+        user_id = member.id
+
+        # Reset user's level in database
+        level = 1
+        xp = 0
+        self.cursor.execute("UPDATE user_levels SET level = %s, xp = %s WHERE user_id = %s",
+                            (level, xp, user_id))
+        self.connection.commit()
+        # send message
         await ctx.send(f"{member.mention} levels reset")
 
     # Give level
     @commands.command()
-    async def levelup(self, ctx, member:discord.Member, levels: int):
-        if message.guild is None or message.guild.id != 1059619615950516334: ### REMOVE BEFORE DEPLOYMENT
+    async def levelup(self, ctx, levels: int, member:discord.Member = None):
+        if ctx.guild is None or ctx.guild.id != 1059619615950516334: ### REMOVE BEFORE DEPLOYMENT
             return
-        self.user_level[member.id] = int(self.user_level[member.id]) + levels
+        
+        member = member or ctx.author
+        user_id = member.id
+
+
+        # Fetch user's current level
+        self.cursor.execute("SELECT level FROM user_levels WHERE user_id = %s", (user_id,))
+        result = self.cursor.fetchone()
+        if result:
+            level = result[0]
+        else:
+            level = 1
+
+        level += levels
+        xp = 0
+        
+        # Update the database with new level and XP
+        self.cursor.execute("UPDATE user_levels SET level = %s, xp = %s WHERE user_id = %s",
+                            (level, xp, user_id))
+        self.connection.commit()
+
         if levels == 1:
             await ctx.send(f"{levels} level added to {member.mention}.")
         else:
             await ctx.send(f"{levels} levels added to {member.mention}.")
 
 
-    # Give XP
+
 
 
         
