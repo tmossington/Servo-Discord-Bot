@@ -337,15 +337,15 @@ async def stats(ctx, user=None):
     rows = None
     if user is None:
         user_id = ctx.author.id
-        rows = db.get_user_stats(cursor, user_id=user_id)
+        rows = db.get_user_stats(connection, cursor, user_id=user_id)
     elif re.match('<@\d+>', user):
         user_id = int(re.sub('\D', '', user)) # If the user argument is a mention
         print(user_id)
-        rows = db.get_user_stats(cursor, user_id=user_id)
+        rows = db.get_user_stats(connection, cursor, user_id=user_id)
     elif user.isdigit():
-        rows = db.get_user_stats(cursor, user_id=int(user)) # If the user argument is a user ID
+        rows = db.get_user_stats(connection, cursor, user_id=int(user)) # If the user argument is a user ID
     else:
-        rows = db.get_user_stats(cursor, username=user) # If the user argument is a username
+        rows = db.get_user_stats(connection, cursor, username=user) # If the user argument is a username
 
     if not rows:
         await ctx.send("No stats found.")
