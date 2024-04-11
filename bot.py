@@ -400,7 +400,7 @@ async def announce(ctx, *, message):
 ticket_ids = {}
 @bot.command(help="Submit a bug report or suggestion for the bot")
 async def ticket(ctx, *, message):
-    channel = bot.get_channel(1228022885486952580)
+    channel = bot.get_channel(1228026400989118464)
     ticket_id = random.randint(1000, 9999)
 
     while ticket_id in ticket_ids:
@@ -432,7 +432,7 @@ async def ticket_close(ctx, ticket_id: int):
         await ctx.send("You do not have permission to use this command.")
         return
     
-    channel = bot.get_channel(1228022885486952580)
+    channel = bot.get_channel(1228026400989118464)
 
     # Get message ID from ticket ID
     message_id = ticket_ids.get(ticket_id)
