@@ -397,32 +397,60 @@ async def announce(ctx, *, message):
     channel = bot.get_channel(883484321804091415)
     await channel.send(message)
 
+ticket_ids = {}
+@bot.command(help="Submit a bug report or suggestion for the bot")
+async def ticket(ctx, *, message):
+    channel = bot.get_channel(1228022885486952580)
+    ticket_id = random.randint(1000, 9999)
 
-#cooldowns = {}
-#@bot.command(help="Submit a suggestion for the bot to the github page")
-#async def suggest(ctx, *, suggestion):
- #   GITHUB_TOKEN = os.getenv('GITHUB_TOKEN')
-  #  REPO_NAME = 'tmossington/Servo-Discord-Bot'
-   # COOLDOWN = timedelta(hours=1)
+    while ticket_id in ticket_ids:
+        ticket_id = random.randit(1000, 9999)
+ 
 
+    # Create embed for the ticket
+    embed = discord.Embed(
+        title=f"Ticket-{ticket_id}",
+        description=message,
+        color=discord.Color.dark_purple()
+    )
+    embed.set_author(name=ctx.author.display_name, icon_url=ctx.author.avatar.url)
+    embed.set_footer(text=f"Ticket created by {ctx.author.display_name}")
 
-   # if ctx.author.id in cooldowns and datetime.now() < cooldowns[ctx.author.id]:
-    #    await ctx.send("You are on cooldown. Please wait before submitting another suggestion.")
-     #   return
+    # Send the embed to the channel
+    sent_message = await channel.send(embed=embed)
+
+    # Store ticket
+    ticket_ids[ticket_id] = sent_message.id
+
+    # Notify user
+    await ctx.send(f"Your ticket has been submitted. The ticket ID is {ticket_id}")
+
+@bot.command(help="Close a ticket")
+async def ticket_close(ctx, ticket_id: int):
+    my_id = os.getenv('discord_id')
+    if str(ctx.author.id) != my_id:
+        await ctx.send("You do not have permission to use this command.")
+        return
     
-    #if any(banned_word in suggestion.lower() for banned_word in banned_words.BANNED_WORDS):
-     #   await ctx.send("Sorry, your suggestion contains inappropriate language.")
-      ## return
+    channel = bot.get_channel(1228022885486952580)
 
-    #g = Github(GITHUB_TOKEN)
-    #repo = g.get_repo(REPO_NAME)
+    # Get message ID from ticket ID
+    message_id = ticket_ids.get(ticket_id)
+    if not message_id:
+        await ctx.send(f"Ticket {ticket_id} does not exist.")
+        return
 
-    # Create a new issue
-    #issue = repo.create_issue(
-    #    title=f"Issue from {ctx.author.name}",
-    #    body=suggestion
-    #)
-    #await ctx.send(f"Issue created: {issue.html_url}")
+    # Get the message by the ID
+    message = await channel.fetch_message(message_id)
+
+    # delete the message
+    await message.delete()
+
+    # Remove ticket ID from dict
+    del ticket_ids[ticket_id]
+
+    # Notify the user
+    await ctx.send(f"Ticket {ticket_id} has been closed.")
 
 
 
