@@ -395,7 +395,16 @@ async def announce(ctx, *, message):
         await ctx.send("You do not have permission to use this command.")
         return
     channel = bot.get_channel(883484321804091415)
-    await channel.send(message)
+
+    # Create an embed for the announcement
+    embed = discord.Embed(
+        title = ":loudspeaker: Announcement",
+        description=message,
+        color=discord.Color.gold()
+    )
+    
+
+    await channel.send(embed=embed)
 
 ticket_ids = {}
 @bot.command(help="Submit a bug report or suggestion for the bot")
