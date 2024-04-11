@@ -2308,6 +2308,7 @@ words = [
     'YOUTH',
     'ZEBRA',
     'ZESTY',
-    'ZONAL'
+    'ZONAL',
+    'JEFFY'
 ]
 
