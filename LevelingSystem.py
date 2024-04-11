@@ -36,10 +36,10 @@ class LevelingSystem(commands.Cog):
         cursor = None
         try:
             connection = mysql.connector.connect(
-                host = '127.0.0.1',
-                user = 'root',
-                password = 'CodyJean10',
-                database = 'rank_system'
+                host = host,
+                user = root,
+                password = password,
+                database = database
             )
 
             if connection.is_connected():
