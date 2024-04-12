@@ -11,6 +11,7 @@ class Wordle:
         self.real_word = real_word
         self.guessed_correctly = False
         self.guesses_made = 0
+        self.guessed_letters_not_in_word = []
         if random_daily:
             self.word = randomanswer.daily_random_word(daily=True).upper()
 
@@ -144,6 +145,9 @@ class Wordle:
             # other absent:
             else:
                 response[j] = guess[j].lower() + "    "
+                # Add the guessed letters to guessed_letters_not_in_word if its not already in it
+                if guess[j] not in self.guessed_letters_not_in_word:
+                    self.guessed_letters_not_in_word.append(guess[j])
 
 
         responseString = ""
@@ -172,7 +176,8 @@ class Wordle:
             if self.guesses == 0:
                 return f"You have run out of guesses, the word was {self.word}."
             else:
-                return responseString, False, guesses_left
+                return responseString, False, guesses_left, ' '.join(self.guessed_letters_not_in_word)
+
 
 
     # Reset guesses
