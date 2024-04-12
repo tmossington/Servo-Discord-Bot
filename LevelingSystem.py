@@ -107,11 +107,33 @@ class LevelingSystem(commands.Cog):
             level += 1
             await message.channel.send(f"Congrats {message.author.mention}! You have leveled up to level {level}!")
 
+
         # Update the database with new level and XP
         self.cursor.execute("UPDATE user_levels SET level = %s, xp = %s WHERE user_id = %s",
                             (level, xp, user_id))
         self.connection.commit()
 
+        # ASSIGN ROLES
+        # Fetch updated level from database
+        self.cursor.execute("SELECT level FROM user_levels WHERE user_id = %s", (user_id,))
+        result = self.cursor.fetchone()
+        if result:
+            level = result[0]
+
+        # assign role based on new level
+        
+        guild = message.guild
+        roles = await guild.fetch_roles()
+        role = None
+        if level == 2:
+            role = discord.utils.get(roles, name="test2")
+
+        # Check if role exists
+        if role:
+            await message.author.add_roles(role)
+        else: # role doesn't exist, must create it
+            role = await guild.create_role(name="test2")
+            await message.author.add_roles(role)
 
 
     @commands.command()
@@ -271,6 +293,7 @@ class LevelingSystem(commands.Cog):
         await self.create_profile_card(user, user_info)
 
         await ctx.send(file=discord.File('profile_card.png'))
+
 
 
 
