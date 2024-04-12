@@ -8,7 +8,11 @@ from discord.ext import commands
 import random
 import mysql.connector
 from mysql.connector import Error
-
+from PIL import Image, ImageDraw, ImageFont
+import requests
+from io import BytesIO
+from easy_pil import Canvas, Editor, Font, load_image_async, Text
+import os
 
 # Componenets:
 
@@ -30,16 +34,21 @@ class LevelingSystem(commands.Cog):
         self.user_level = {}
         self.connection, self.cursor = self.connect_to_db()
 
+    host = os.getenv('host')
+    user = os.getenv('user')
+    password = os.getenv('password')
+    database = os.getenv('database_level')
+
     def connect_to_db(self):
         # Connect to MySQL Database
         connection = None
         cursor = None
         try:
             connection = mysql.connector.connect(
-                host = host,
-                user = root,
-                password = password,
-                database = database
+                host = self.host,
+                user = self.user,
+                password = self.password,
+                database = self.database
             )
 
             if connection.is_connected():
@@ -189,10 +198,81 @@ class LevelingSystem(commands.Cog):
             await ctx.send(f"{levels} levels added to {member.mention}.")
 
 
+    async def get_user_info(self, user_id):
+        # Fetch user's current level and XP from database
+        self.cursor.execute("SELECT level, xp FROM user_levels WHERE user_id = %s", (user_id,))
+        result = self.cursor.fetchone()
+        if result:
+            level, xp = result
+        else:
+            # If user doesn't exist in database, initialize their level and XP
+            level = 1
+            xp = 0
+
+        # Calculate XP needed for next level
+        xp_needed = level**2 * 100
+
+        # Calculate rank (this is just an example, replace it with your actual rank calculation)
+        rank = 1
+
+        return {
+            'level': level,
+            'xp': xp,
+            'xp_needed': xp_needed,
+            'rank': rank
+        }
+
+    async def create_profile_card(self, user, user_info):
+        canvas = Canvas((500, 200))
+
+        # Load background image
+        background = Image.open('b6076bb4df9a3532e01ad33b4e563643.jpg')
+        background = background.resize((500, 200))
+
+        # Paste background image onto canvas
+        editor = Editor(canvas)
+        editor.paste(background, (0, 0))
+
+        # Load user avatar
+        avatar = await load_image_async(user.avatar.url)
+        avatar = avatar.resize((80, 80))
+
+        # paste avatar onto canvas
+        editor.paste(avatar, (20, 20))
+
+        # Load Arial font with specific size
+        font = ImageFont.truetype("Arial.ttf", 15)
+
+        # Draw text
+        editor.text((120, 30), user.name, font=font)
+
+        # Draw user level, xp, and rank
+        editor.text((120, 60), f"Level: {user_info['level']}", font=font)
+        editor.text((120, 90), f"XP: {user_info['xp']}/{user_info['xp_needed']}", font=font)
+        editor.text((120, 120), f"Rank: {user_info['rank']}", font=font)
+
+        # Draw progress bar for XP
+        progress = user_info['xp'] / user_info['xp_needed']
+        editor.rectangle((120, 150), 300, 20, fill=(255, 0, 0))  # Red background
+        editor.rectangle((120, 150), 300 * progress, 20, fill=(0, 255, 0))  # Green progress bar
+
+        # Save image
+        editor.save('profile_card.png')
+
+    @commands.command()
+    async def profile(self, ctx, user: discord.User = None):
+        if user is None:
+            user = ctx.author  # If no user is mentioned, use the author of the message
+
+    
+         # Get the user's level, experience, and rank from the database
+        user_info = await self.get_user_info(user.id)
+
+        await self.create_profile_card(user, user_info)
+
+        await ctx.send(file=discord.File('profile_card.png'))
 
 
-
-        
 
 async def setup(bot):
     await bot.add_cog(LevelingSystem(bot))
