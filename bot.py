@@ -486,11 +486,13 @@ async def morning_report():
     # Verify correct time to report
     eastern = pytz.timezone('US/Eastern')
     current_time = datetime.now(eastern)
+    current_date = datetime.now().date()
+    day_of_week = current_date.strftime('%A')
 
     if current_time.hour == 8 and current_time.minute == 0:
         # Perform all data collection jobs for the report
         # Get the channel to send the report
-        channel = bot.get_channel(883484321804091415)
+        channel = bot.get_channel(1059619616814547117)
         # Get the weather report for Arlington, VA and Warren, MI
         weather_report_VA = await fetch_weather('22201')
         weather_report_MI = await fetch_weather('48089')
@@ -498,12 +500,19 @@ async def morning_report():
         # News report
         headlines = await fetch_nyt(channel)
 
-        await channel.send(f"Good morning! Here is the morning report: \n\nWeather: \n"
-                        f"Arlington, VA: {weather_report_VA}\n"
-                        f"Warren, MI: {weather_report_MI}\n\n"
-                        f"Top News Headlines: \n{headlines}\n\n"
+        message = (f"Good morning! Here is the morning report: \n\n **Weather:** \n Arlington, VA: {weather_report_VA}\n Warren, MI: {weather_report_MI}\n\n **Top News Headlines:** \n{headlines}\n\n Have a great day!")
 
-                        f"Have a great day!")
+
+        embed = discord.Embed(
+        title=f"Morning Report for {day_of_week}, {current_date}",
+        description=message,
+        color=discord.Color.blue()
+    )
+    
+        await channel.send(embed=embed)
+        
+
+                        
         
 @bot.command()
 async def reload_cog(ctx, *, cog: str):
