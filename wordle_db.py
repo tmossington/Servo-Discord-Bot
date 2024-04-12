@@ -74,7 +74,7 @@ def update_user_stats(connection, cursor, user_id, username, game_won, num_guess
             total_guesses = 0 if total_guesses is None else total_guesses
             average_guesses_per_game = 0 if average_guesses_per_game is None else average_guesses_per_game
             execute_query(connection, cursor, 'UPDATE user_stats SET username = %s, games_played = %s, games_won = %s, games_lost = %s, total_guesses = %s, average_guesses_per_game = %s, last_played = %s WHERE user_id = %s', (username, games_played + 1, games_won + int(game_won), games_lost + int(not game_won), total_guesses + num_guesses,int(num_guesses/games_played), current_date, user_id))
-
+            execute_query(connection, cursor, 'UPDATE user_stats SET username = %s, games_played = %s, games_won = %s, games_lost = %s, total_guesses = %s, average_guesses_per_game = %s, last_played = %s WHERE user_id = %s', (username, games_played + 1, games_won + int(game_won), games_lost + int(not game_won), total_guesses + num_guesses, int((total_guesses + num_guesses) / (games_played + 1)), current_date, user_id))
     # Commit the changes
     connection.commit()
 
