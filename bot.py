@@ -114,7 +114,43 @@ async def on_message(message):
         
         guess = message.content
         response = game.send_guess(guess)
-        await message.channel.send(response)
+
+        
+
+
+    #Get incorrect letters
+        guessed_letters_not_in_word = response[3] if len(response) > 3 else None
+
+            # Parse the response based on its type
+        if isinstance(response, tuple):
+            # Get the number of guesses left and the guessed letters not in the word
+            guesses_left = response[2] if len(response) > 2 else None
+            guessed_letters_not_in_word = response[3] if len(response) > 3 else None
+            response_string = response[0]
+        else:
+            # The response is a string
+            guesses_left = None
+            guessed_letters_not_in_word = None
+            response_string = response
+
+        # Create the embed
+        embed = discord.Embed(
+            title=f"Wordle! \n{guesses_left} guesses left" if guesses_left else "Wordle!",
+            description = response_string,
+            color=discord.Color.dark_green()
+            )
+        
+        # Add guessed_letters_not_in_word to embed
+        if guessed_letters_not_in_word:
+            embed.add_field(name="Incorrect letters:", value=guessed_letters_not_in_word, inline=False)
+
+        #await ctx.send(response)
+        await message.channel.send(embed=embed)
+
+
+
+
+        #await message.channel.send(response)
         if game.is_over():
             daily_game_active = False
             games.pop(message.channel.id)
@@ -130,8 +166,13 @@ async def on_message(message):
 @bot.command(help="Generates a random number between 0 and 10^10")
 async def number(ctx):
     random_num = random.uniform(0, 10**10)
+    embed = discord.Embed(
+        title=f"Random number:",
+        description=random_num,
+        color=discord.Color.red()
+    )
 
-    await ctx.send(f"Random number: {random_num}")
+    await ctx.send(embed=embed)
 
 async def fetch_weather(location):
     # Check if the input is a valid zip code
@@ -184,7 +225,14 @@ async def fetch_weather(location):
 @bot.command(help="Returns the current weather for a specified location")
 async def weather(ctx, *, location):
     weather_report = await fetch_weather(location)
-    await ctx.send(weather_report)
+    embed = discord.Embed(
+        title=f"Current Weather for {location}",
+        description=weather_report,
+        color= discord.Color.blue()
+
+    )
+
+    await ctx.send(embed=embed)
 
 # Financial Report using Tiingo API
 @bot.command(help="Returns the current price of a stock symbol")
@@ -211,20 +259,33 @@ async def price(ctx, *, symbol):
         for item in data:
             price = item.get('last')
             symbol = item.get('ticker')
-            await ctx.send(f"{symbol}: ${price}")
+            # Make embed
+            embed = discord.Embed(
+                title=f"Current price for {symbol}",
+                description=f"${price}",
+                color=discord.Color.gold()
+            )
+            await ctx.send(embed=embed)
 
      # if it's a dictionary, get the relevant information
     elif isinstance(data, dict):
         price = data.get('last')
         symbol = data.get('ticker')
-        await ctx.send(f"{symbol}: ${price}")
+
+        # Make embed
+        embed = discord.Embed(
+            title=f"Current price for {symbol}",
+            description=f"${price}",
+            color=discord.Color.gold()
+        )
+        await ctx.send(embed=embed)
 
     # if it's neither, send an error message
     else:
         await ctx.send("Invalid response format.")
 
 
-@bot.command(help="Returns the current price of a cryptocurrency")
+@bot.command(help="Returns current crypto price. Symbol given must include currency (BTCUSD, not BTC for bitcoin in USD).")
 async def crypto(ctx, *, symbol):
     stockAPI_Key = os.getenv('tiingo_API')
     #url = f'https://api.tiingo.com/tiingo/crypto/prices?tickers={symbol}&token={stockAPI_Key}'
@@ -252,10 +313,22 @@ async def crypto(ctx, *, symbol):
             if isinstance(topOfBookData, list):
                 for book_data in topOfBookData:
                     price = book_data.get('lastPrice')
-                    await ctx.send(f"{symbol}: ${price}")
+
+                    # Make embed:
+                    embed = discord.Embed(
+                        title=f"Current price for {symbol}",
+                        description=f"${price}",
+                        color=discord.Color.dark_gold()
+                    )
+                    await ctx.send(embed=embed)
             else:
                 price = topOfBookData.get('lastPrice')
-                await ctx.send(f"{symbol}: ${price}")
+                embed = discord.Embed(
+                    title=f"Current price for {symbol}",
+                    description=f"${price}",
+                    color=discord.Color.dark_gold()
+                    )
+                await ctx.send(embed=embed)
 
      # if it's a dictionary, get the relevant information
     elif isinstance(data, dict):
@@ -292,7 +365,32 @@ async def wordle(ctx, guess: str):
         # Remove game from the games dictionary
         del games[ctx.channel.id]
     print(response)
-    await ctx.send(response)
+
+    # Parse the response based on its type
+    if isinstance(response, tuple):
+        # Get the number of guesses left and the guessed letters not in the word
+        guesses_left = response[2] if len(response) > 2 else None
+        guessed_letters_not_in_word = response[3] if len(response) > 3 else None
+        response_string = response[0]
+    else:
+        # The response is a string
+        guesses_left = None
+        guessed_letters_not_in_word = None
+        response_string = response
+
+    # Create the embed
+    embed = discord.Embed(
+        title=f"Wordle! \n{guesses_left} guesses left" if guesses_left else "Wordle!",
+        description = response_string,
+        color=discord.Color.dark_green()
+        )
+    
+    # Add guessed_letters_not_in_word to embed
+    if guessed_letters_not_in_word:
+        embed.add_field(name="Incorrect letters:", value=guessed_letters_not_in_word, inline=False)
+
+    #await ctx.send(response)
+    await ctx.send(embed=embed)
 
 @bot.command(help="Starts a new game of wordle")
 async def new_wordle(ctx):
