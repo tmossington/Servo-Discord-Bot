@@ -532,6 +532,7 @@ async def announce(ctx, *, message):
     await channel.send(embed=embed)
 
 ticket_ids = {}
+ticket_creators = {}
 @bot.command(help="Submit a bug report or suggestion for the bot")
 async def ticket(ctx, *, message):
     channel = bot.get_channel(1228026400989118464)
@@ -539,6 +540,7 @@ async def ticket(ctx, *, message):
 
     while ticket_id in ticket_ids:
         ticket_id = random.randit(1000, 9999)
+
  
 
     # Create embed for the ticket
@@ -547,7 +549,14 @@ async def ticket(ctx, *, message):
         description=message,
         color=discord.Color.dark_purple()
     )
-    embed.set_author(name=ctx.author.display_name, icon_url=ctx.author.avatar.url)
+
+# Check if the author has an avatar
+    if ctx.author.avatar:
+        avatar_url = ctx.author.avatar.url
+    else:
+        avatar_url = 'https://example.com/default_avatar.png'
+
+    embed.set_author(name=ctx.author.display_name, icon_url=avatar_url)
     embed.set_footer(text=f"Ticket created by {ctx.author.display_name}")
 
     # Send the embed to the channel
@@ -555,6 +564,7 @@ async def ticket(ctx, *, message):
 
     # Store ticket
     ticket_ids[ticket_id] = sent_message.id
+    ticket_creators[ticket_id] = str(ctx.author.id)
 
     # Notify user
     await ctx.send(f"Your ticket has been submitted. The ticket ID is {ticket_id}")
@@ -562,7 +572,9 @@ async def ticket(ctx, *, message):
 @bot.command(help="Close a ticket")
 async def ticket_close(ctx, ticket_id: int):
     my_id = os.getenv('discord_id')
-    if str(ctx.author.id) != my_id:
+    creator_id = ticket_creators.get(ticket_id)
+
+    if str(ctx.author.id) != my_id and str(ctx.author.id) != creator_id:
         await ctx.send("You do not have permission to use this command.")
         return
     
