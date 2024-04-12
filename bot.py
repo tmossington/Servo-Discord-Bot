@@ -614,7 +614,7 @@ async def morning_report():
     current_date = datetime.now().date()
     day_of_week = current_date.strftime('%A')
 
-    if current_time.hour == 10 and current_time.minute == 10:
+    if current_time.hour == 8 and current_time.minute == 0:
         # Perform all data collection jobs for the report
         # Get the channel to send the report
         channel = bot.get_channel(883484321804091415)
