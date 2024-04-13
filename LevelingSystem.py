@@ -13,6 +13,8 @@ import requests
 from io import BytesIO
 from easy_pil import Canvas, Editor, Font, load_image_async, Text
 import os
+import json
+from dotenv import load_dotenv
 
 # Componenets:
 
@@ -34,10 +36,18 @@ class LevelingSystem(commands.Cog):
         self.user_level = {}
         self.connection, self.cursor = self.connect_to_db()
 
+
     host = os.getenv('host')
     user = os.getenv('user')
     password = os.getenv('password')
     database = os.getenv('database_level')
+    load_dotenv()
+
+    json_str = os.getenv('role_dict')
+    role_dict_str = json.loads(json_str)
+  
+    # Convert keys to int
+    role_dict = {int(k): v for k, v in role_dict_str.items()}
 
     def connect_to_db(self):
         # Connect to MySQL Database
@@ -67,6 +77,7 @@ class LevelingSystem(commands.Cog):
         
         return connection, cursor
 
+
     async def update_user_stats(self, user_id, username, xp, level):
         try:
             self.cursor.execute("INSERT INTO user_levels (user_id, username, xp, level) VALUES (%s, %s, %s, %S) "
@@ -75,6 +86,8 @@ class LevelingSystem(commands.Cog):
             self.connection.commit()
         except Error as e:
             print("Error while update MySQL", e)
+
+
 
     @commands.Cog.listener()
     async def on_message(self, message):
@@ -124,22 +137,35 @@ class LevelingSystem(commands.Cog):
                                 (level, xp, user_id))
             self.connection.commit()
 
+            
 
             ## Assign roles
             self.cursor.execute("SELECT level FROM user_levels WHERE user_id = %s", (user_id,))
             result = self.cursor.fetchone()
             if result:
                 level = result[0]
-            if level == 2:
+
+            # Check if user's new level is in the dictionary:
+            if level in self.role_dict:
+                old_level = int(level) - 1
+                if old_level in self.role_dict:
+                    # Remove old row
+                    old_role = discord.utils.get(message.author.roles, name = self.role_dict[old_level])
+                    if old_role:
+                        await message.author.remove_roles(old_role)
+                
+                # Assign new role
                 guild = message.guild
                 roles = await guild.fetch_roles()
-                role = discord.utils.get(roles, name="test2")
+                role = discord.utils.get(roles, name=self.role_dict[level])
                 if role and role not in message.author.roles:
                     await message.author.add_roles(role)
                 elif not role:
                     # Role doesn't exist
-                    role = await guild.create_role(name="test2")
+                    role = await guild.create_role(name=self.role_dict[level])
                     await message.author.add_roles(role)
+
+                
 
 
 
