@@ -102,37 +102,45 @@ class LevelingSystem(commands.Cog):
         # Give user random XP between 1 and 9
         xp += random.randint(10, 25)
 
+        # Update the database with new XP
+        self.cursor.execute("UPDATE user_levels SET xp = %s WHERE user_id = %s", (xp, user_id))
+        self.connection.commit()
+
+        # Fetch updated xp
+        self.cursor.execute("SELECT xp FROM user_levels WHERE user_id = %s", (user_id,))
+        result = self.cursor.fetchone()
+        if result:
+            xp = result[0]
+
         # Level up user when they reach enough XP
         if xp >= level**2 * 100:
             level += 1
+            xp = 0
             await message.channel.send(f"Congrats {message.author.mention}! You have leveled up to level {level}!")
 
 
         # Update the database with new level and XP
-        self.cursor.execute("UPDATE user_levels SET level = %s, xp = %s WHERE user_id = %s",
+            self.cursor.execute("UPDATE user_levels SET level = %s, xp = %s WHERE user_id = %s",
                                 (level, xp, user_id))
-        self.connection.commit()
+            self.connection.commit()
 
-        # ASSIGN ROLES
-        # Fetch updated level from database
-        self.cursor.execute("SELECT level FROM user_levels WHERE user_id = %s", (user_id,))
-        result = self.cursor.fetchone()
-        if result:
-            level = result[0]
 
-            # assign role based on new level
-            
-        guild = message.guild
-        roles = await guild.fetch_roles()
-        role = None
-        if level == 2:
-            role = discord.utils.get(roles, name="test2")
-        if role and role not in message.author.roles:
-            await message.author.add_roles(role)
-        elif not role:
-            # Role doesn't exist
-            role = await guild.create_role(name="test2")
-            await message.author.add_roles(role)
+            ## Assign roles
+            self.cursor.execute("SELECT level FROM user_levels WHERE user_id = %s", (user_id,))
+            result = self.cursor.fetchone()
+            if result:
+                level = result[0]
+            if level == 2:
+                guild = message.guild
+                roles = await guild.fetch_roles()
+                role = discord.utils.get(roles, name="test2")
+                if role and role not in message.author.roles:
+                    await message.author.add_roles(role)
+                elif not role:
+                    # Role doesn't exist
+                    role = await guild.create_role(name="test2")
+                    await message.author.add_roles(role)
+
 
 
     @commands.command()
