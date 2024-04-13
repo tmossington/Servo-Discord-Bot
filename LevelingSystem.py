@@ -110,7 +110,7 @@ class LevelingSystem(commands.Cog):
 
         # Update the database with new level and XP
         self.cursor.execute("UPDATE user_levels SET level = %s, xp = %s WHERE user_id = %s",
-                            (level, xp, user_id))
+                                (level, xp, user_id))
         self.connection.commit()
 
         # ASSIGN ROLES
@@ -120,18 +120,17 @@ class LevelingSystem(commands.Cog):
         if result:
             level = result[0]
 
-        # assign role based on new level
-        
+            # assign role based on new level
+            
         guild = message.guild
         roles = await guild.fetch_roles()
         role = None
         if level == 2:
             role = discord.utils.get(roles, name="test2")
-
-        # Check if role exists
-        if role:
+        if role and role not in message.author.roles:
             await message.author.add_roles(role)
-        else: # role doesn't exist, must create it
+        elif not role:
+            # Role doesn't exist
             role = await guild.create_role(name="test2")
             await message.author.add_roles(role)
 
