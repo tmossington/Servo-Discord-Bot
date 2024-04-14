@@ -112,8 +112,8 @@ class LevelingSystem(commands.Cog):
                                 (user_id, username, level, xp))
             self.connection.commit()
 
-        # Give user random XP between 1 and 9
-        xp += random.randint(10, 25)
+        # Give user random XP between 10 and 50
+        xp += random.randint(10, 50)
 
         # Update the database with new XP
         self.cursor.execute("UPDATE user_levels SET xp = %s WHERE user_id = %s", (xp, user_id))
@@ -129,22 +129,19 @@ class LevelingSystem(commands.Cog):
         if xp >= level**2 * 100:
             level += 1
             xp = 0
-            await message.channel.send(f"Congrats {message.author.mention}! You have leveled up to level {level}!")
 
-
-        # Update the database with new level and XP
+            # Update the database with new level and XP
             self.cursor.execute("UPDATE user_levels SET level = %s, xp = %s WHERE user_id = %s",
                                 (level, xp, user_id))
             self.connection.commit()
-
-            
-
+        
             ## Assign roles
             self.cursor.execute("SELECT level FROM user_levels WHERE user_id = %s", (user_id,))
             result = self.cursor.fetchone()
             if result:
                 level = result[0]
 
+            new_role_name = None
             # Check if user's new level is in the dictionary:
             if level in self.role_dict:
                 old_level = int(level) - 1
@@ -164,6 +161,14 @@ class LevelingSystem(commands.Cog):
                     # Role doesn't exist
                     role = await guild.create_role(name=self.role_dict[level])
                     await message.author.add_roles(role)
+                    new_role_name = role.name
+
+            # Send level up message
+            if new_role_name:
+                await message.channel.send(f"Congrats {message.author.mention}! You have leveled up to level {level} and earned the role {new_role_name}!")
+            else:
+                await message.channel.send(f"Congrats {message.author.mention}! You have leveled up to level {level}!")
+
 
                 
 
@@ -280,8 +285,38 @@ class LevelingSystem(commands.Cog):
     async def create_profile_card(self, user, user_info):
         canvas = Canvas((500, 200))
 
+        # Level dictionary with image names
+        image_dict= {
+            range(1, 5): '1.jpg',
+            range(5, 9): '2.jpg',
+            range(10, 14): '3.jpg',
+            range(15, 19): '4.jpg',
+            range(20, 29): '5.jpg',
+            range(30, 39): '6.jpg',
+            range(40, 49): '7.jpg',
+            range(50, 59): '8.jpg',
+            range(60, 69): '9.jpg',
+            range(70, 79): '10.jpg',
+            range(80, 89): '11.jpg',
+            range(90, 99): '12.jpg',
+            range(100, 119): '13.jpg',
+            range(120, 139): '14.jpg',
+            range(140, 159): '15.jpg',
+            range(160, 179): '16.jpg',
+            range(180, 199): '17.jpg',
+            range(200, 500): '18.jpg'
+        }
+
+        # Find the image file name for the user's level
+        for level_range, file_name in image_dict.items():
+            if user_info["level"] in level_range:
+                image_file = file_name
+                break
+        else:
+            image_file = 'default.jpg'
+
         # Load background image
-        background = Image.open('b6076bb4df9a3532e01ad33b4e563643.jpg')
+        background = Image.open(f'/Users/tmossington/Projects/profile_images/{image_file}')
         background = background.resize((500, 200))
 
         # Paste background image onto canvas
