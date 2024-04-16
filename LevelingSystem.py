@@ -307,7 +307,7 @@ class LevelingSystem(commands.Cog):
             range(200, 500): '18.jpg'
         }
 
-        # Find the image file name for the user's level
+        #Find the image file name for the user's level
         for level_range, file_name in image_dict.items():
             if user_info["level"] in level_range:
                 image_file = file_name
@@ -315,39 +315,52 @@ class LevelingSystem(commands.Cog):
         else:
             image_file = 'default.jpg'
 
+        
+
         # Load background image
         background = Image.open(f'/Users/tmossington/Projects/profile_images/{image_file}')
         background = background.resize((500, 200))
 
-        # Paste background image onto canvas
-        editor = Editor(canvas)
-        editor.paste(background, (0, 0))
+        filter = Image.new('RGBA', background.size, (0, 0, 0, 128))
+
+        background.paste(filter, (0, 0), filter)
+
+        draw = ImageDraw.Draw(background)
+
 
         # Load user avatar
-        avatar = await load_image_async(user.avatar.url)
+        response = requests.get(user.avatar.url)
+        avatar = Image.open(BytesIO(response.content))
         avatar = avatar.resize((80, 80))
 
+        # Create mask image
+        mask = Image.new('L', avatar.size, 0)
+        draw_mask = ImageDraw.Draw(mask)
+        draw_mask.ellipse((0, 0) + avatar.size, fill=255)
+
+        avatar.putalpha(mask)
+
         # paste avatar onto canvas
-        editor.paste(avatar, (20, 20))
+        background.paste(avatar, (20, 20), avatar)
 
         # Load Arial font with specific size
         font = ImageFont.truetype("Arial.ttf", 15)
 
-        # Draw text
-        editor.text((120, 30), user.name, font=font)
 
         # Draw user level, xp, and rank
-        editor.text((120, 60), f"Level: {user_info['level']}", font=font)
-        editor.text((120, 90), f"XP: {user_info['xp']}/{user_info['xp_needed']}", font=font)
-        editor.text((120, 120), f"Rank: {user_info['rank']}", font=font)
+        draw.text((120, 30), user.name, font=font)
+        draw.text((120, 60), f"Level: {user_info['level']}", font=font)
+        draw.text((120, 90), f"XP: {user_info['xp']}/{user_info['xp_needed']}", font=font)
+        draw.text((120, 120), f"Rank: {user_info['rank']}", font=font)
 
         # Draw progress bar for XP
+        user_info['xp'] = max(min(user_info['xp'], user_info['xp_needed']), 0)
         progress = user_info['xp'] / user_info['xp_needed']
-        editor.rectangle((120, 150), 300, 20, fill=(255, 0, 0))  # Red background
-        editor.rectangle((120, 150), 300 * progress, 20, fill=(0, 255, 0))  # Green progress bar
+        draw.rounded_rectangle((120, 150, 420, 170), radius=10, fill="gray") # Gray background with rounded corners
+        draw.rounded_rectangle((120, 150, 120 + 300 * progress, 170), radius=10, fill=(50, 162, 168))
 
         # Save image
-        editor.save('profile_card.png')
+        background.save('profile_card.png')
 
     @commands.command()
     async def profile(self, ctx, user: discord.User = None):
