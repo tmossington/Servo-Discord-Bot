@@ -2,10 +2,12 @@ from dictionary import words
 from datetime import datetime
 import math
 import random
+import pytz
 
 # Find UNIX timestamp
 current_time = datetime.now()
-UNIX_reference = 1645678800
+UNIX_reference = 1648226400
+
 
 # Function that picks a random word from the dictionary every day
 def daily_random_word(daily: bool = True):
