@@ -4,6 +4,7 @@ from mysql.connector import Error
 from datetime import datetime
 import os
 from dotenv import load_dotenv
+from pytz import timezone
 
 load_dotenv()
 
@@ -58,7 +59,8 @@ def update_user_stats(connection, cursor, user_id, username, game_won, num_guess
     # Update the user stats in the database
     execute_query(connection, cursor, 'SELECT username, games_played, games_won, games_lost, total_guesses, average_guesses_per_game, last_played FROM user_stats WHERE user_id = %s', (user_id,))
     row = cursor.fetchone()
-    current_date = datetime.now().date()
+    eastern = timezone('US/Eastern')
+    current_date = datetime.now(eastern).date()
 
     # If the user has no stats yet, insert a new row
     if row is None:
