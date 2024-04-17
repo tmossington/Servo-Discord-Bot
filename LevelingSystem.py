@@ -37,8 +37,9 @@ class LevelingSystem(commands.Cog):
         self.connection, self.cursor = self.connect_to_db()
     
     
-
-    GUILD_ID = os.getenv('GUILD_ID')
+    #GUILD_ID = 1059619615950516334
+    GUILD = os.getenv('GUILD_ID')
+    GUILD_ID = int(GUILD)
     host = os.getenv('host')
     user = os.getenv('user')
     password = os.getenv('password')

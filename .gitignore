@@ -16,3 +16,11 @@ Arial.ttf
 profile_card.png
 profile_images/default.jpg
 __pycache__/SteamStats.cpython-310.pyc
+__pycache__/banned_words.cpython-38.pyc
+__pycache__/capital_game.cpython-38.pyc
+__pycache__/dictionary.cpython-38.pyc
+__pycache__/LevelingSystem.cpython-38.pyc
+__pycache__/randomanswer.cpython-38.pyc
+__pycache__/SteamStats.cpython-38.pyc
+__pycache__/wordle_db.cpython-38.pyc
+__pycache__/wordle.cpython-38.pyc
