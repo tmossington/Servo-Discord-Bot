@@ -172,6 +172,7 @@ class LevelingSystem(commands.Cog):
                 role = discord.utils.get(roles, name=self.role_dict[level])
                 if role and role not in message.author.roles:
                     await message.author.add_roles(role)
+                    new_role_name = role.name
                 elif not role:
                     # Role doesn't exist
                     role = await guild.create_role(name=self.role_dict[level])
