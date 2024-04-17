@@ -128,7 +128,7 @@ class LevelingSystem(commands.Cog):
             self.connection.commit()
 
         # Give user random XP between 10 and 50
-        xp += random.randint(25, 75)
+        xp += random.randint(50, 80)
 
         # Update the database with new XP
         self.cursor.execute("UPDATE user_levels SET xp = %s WHERE user_id = %s", (xp, user_id))
