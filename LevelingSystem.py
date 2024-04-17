@@ -202,7 +202,7 @@ class LevelingSystem(commands.Cog):
 
     @commands.command()
     async def leaderboard(self, ctx, limit: str = '10'):
-        if ctx.guild.id != self.GUILD_ID
+        if ctx.guild.id != self.GUILD_ID:
             return
         
         # Fetch top 10 user's levels from database
