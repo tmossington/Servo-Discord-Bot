@@ -35,8 +35,10 @@ class LevelingSystem(commands.Cog):
         self.user_xp = {}
         self.user_level = {}
         self.connection, self.cursor = self.connect_to_db()
+    
+    
 
-
+    GUILD_ID = os.getenv('GUILD_ID')
     host = os.getenv('host')
     user = os.getenv('user')
     password = os.getenv('password')
@@ -72,6 +74,8 @@ class LevelingSystem(commands.Cog):
                 connection.database = "rank_system"
                 cursor.execute("CREATE TABLE IF NOT EXISTS user_levels (user_id VARCHAR(255), username VARCHAR(255), level INT DEFAULT 1, xp INT DEFAULT 0, PRIMARY KEY (user_id))")
                 connection.commit() # commit the new table
+            else:
+                raise Exception("Failed to connect to the database")
         except Error as e:
             print("Error while connecting to MySQL", e)
         
@@ -91,9 +95,13 @@ class LevelingSystem(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
-        if message.author.bot:
+
+        # Check if the message is from the correct guild
+        if message.guild.id != self.GUILD_ID:
             return
-        if message.guild is None or message.guild.id != 1059619615950516334: #### REMOVE BEFORE DEPLOYMENT
+        
+        # Verify message author is not a bot
+        if message.author.bot:
             return
         
         user_id = message.author.id
@@ -176,7 +184,7 @@ class LevelingSystem(commands.Cog):
 
     @commands.command()
     async def level(self, ctx, member: discord.Member = None):
-        if ctx.guild is None or ctx.guild.id != 1059619615950516334: ### REMOVE BEFORE DEPLOYMENT
+        if ctx.guild.id != self.GUILD_ID:
             return
         member = member or ctx.author
         user_id = member.id
@@ -194,7 +202,7 @@ class LevelingSystem(commands.Cog):
 
     @commands.command()
     async def leaderboard(self, ctx, limit: str = '10'):
-        if ctx.guild is None or ctx.guild.id != 1059619615950516334: ### REMOVE BEFORE DEPLOYMENT
+        if ctx.guild.id != self.GUILD_ID
             return
         
         # Fetch top 10 user's levels from database
@@ -211,7 +219,8 @@ class LevelingSystem(commands.Cog):
     # Reset user levels
     @commands.command()
     async def reset(self, ctx, member: discord.Member):
-        if ctx.guild is None or ctx.guild.id != 1059619615950516334: ### REMOVE BEFORE DEPLOYMENT
+        if ctx.author.id != 305113361979539468 or ctx.guild.id != self.GUILD_ID:
+            await ctx.send("You are not authorized to use this command.")
             return
         
         member = member or ctx.author
@@ -229,7 +238,8 @@ class LevelingSystem(commands.Cog):
     # Give level
     @commands.command()
     async def levelup(self, ctx, levels: int, member:discord.Member = None):
-        if ctx.guild is None or ctx.guild.id != 1059619615950516334: ### REMOVE BEFORE DEPLOYMENT
+        if ctx.author.id != 305113361979539468 or ctx.guild.id != self.GUILD_ID:
+            await ctx.send("You are not authorized to use this command.")
             return
         
         member = member or ctx.author
@@ -308,17 +318,17 @@ class LevelingSystem(commands.Cog):
         }
 
         #Find the image file name for the user's level
-        for level_range, file_name in image_dict.items():
-            if user_info["level"] in level_range:
-                image_file = file_name
-                break
-        else:
-            image_file = 'default.jpg'
+        #for level_range, file_name in image_dict.items():
+         #   if user_info["level"] in level_range:
+          #      image_file = file_name
+           #     break
+        #else:
+         #   image_file = 'default.jpg'
 
         
-
+        image_file = 'default.jpg'
         # Load background image
-        background = Image.open(f'/Users/tmossington/Projects/profile_images/{image_file}')
+        background = Image.open(f'/Users/azureuser/Servo-Discord-Bot/profile_images/{image_file}')
         background = background.resize((500, 200))
 
         filter = Image.new('RGBA', background.size, (0, 0, 0, 128))
