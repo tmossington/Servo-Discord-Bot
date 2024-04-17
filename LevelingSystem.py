@@ -306,7 +306,7 @@ class LevelingSystem(commands.Cog):
 
         sorted_users = sorted(results, key=lambda x: (-x[1], -x[2]))
         # Calculate rank (this is just an example, replace it with your actual rank calculation)
-        rank = next(i for i, x in enumerate(sorted_users, start=1) if x[0] == user_id)
+        rank = next((i for i, x in enumerate(sorted_users, start=1) if x[0] == user_id), None)
 
         return {
             'level': level,
