@@ -128,7 +128,7 @@ class LevelingSystem(commands.Cog):
             self.connection.commit()
 
         # Give user random XP between 10 and 50
-        xp += random.randint(10, 50)
+        xp += random.randint(25, 75)
 
         # Update the database with new XP
         self.cursor.execute("UPDATE user_levels SET xp = %s WHERE user_id = %s", (xp, user_id))
@@ -218,9 +218,20 @@ class LevelingSystem(commands.Cog):
         else:
             self.cursor.execute('SELECT * FROM user_levels ORDER BY level DESC, xp DESC LIMIT %s', (int(limit),))
         rows = self.cursor.fetchall()
+        
+
+        embed = discord.Embed(
+        title=f"Levels Leaderboard",
+        color=discord.Color.dark_blue()
+            )
+        
         for row in rows:
             user_id, username, level, xp = row
-            await ctx.send(f"Username: **{username}**, Level: {level}")
+            message = (f"Username: **{username}**, Level: {level}")
+        
+            embed.description = embed.description + "\n\n" + message if embed.description else message
+
+        await ctx.send(embed=embed)
 
     
     # Reset user levels
@@ -335,7 +346,7 @@ class LevelingSystem(commands.Cog):
         
         image_file = 'default.jpg'
         # Load background image
-        background = Image.open(f'/Users/azureuser/Servo-Discord-Bot/profile_images/{image_file}')
+        background = Image.open(f'/home/azureuser/Servo-Discord-Bot/profile_images/{image_file}')
         background = background.resize((500, 200))
 
         filter = Image.new('RGBA', background.size, (0, 0, 0, 128))
