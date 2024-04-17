@@ -41,7 +41,8 @@ help_command = commands.DefaultHelpCommand(
 
 bot = commands.Bot(command_prefix = '/', intents=intents, help_command = help_command)
 
-bot.load_extension(f'Cog.LevelingSystem[:-3]')
+bot.load_extension('Cog.LevelingSystem')
+bot.load_extension('Cog.SteamStats')
 
 #bot.load_extension=('levels')
 
@@ -64,6 +65,8 @@ async def on_ready():
 
     await bot.load_extension('LevelingSystem')
     print('LevelingSystem cog loaded')
+    await bot.load_extension('SteamStats')
+    print('SteamStats cog loaded')
 
 
 # Welcome Message
