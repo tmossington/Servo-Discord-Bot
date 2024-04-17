@@ -289,10 +289,12 @@ class LevelingSystem(commands.Cog):
 
     async def get_user_info(self, user_id):
         # Fetch user's current level and XP from database
-        self.cursor.execute("SELECT level, xp FROM user_levels WHERE user_id = %s", (user_id,))
-        result = self.cursor.fetchone()
-        if result:
-            level, xp = result
+        self.cursor.execute("SELECT user_id, level, xp FROM user_levels")
+        results = self.cursor.fetchall()
+        # Find current user's xp and level
+        current_user = next((x for x in results if x[0] == user_id), None)
+        if current_user:
+            level, xp = current_user[1], current_user[2]
         else:
             # If user doesn't exist in database, initialize their level and XP
             level = 1
@@ -301,8 +303,10 @@ class LevelingSystem(commands.Cog):
         # Calculate XP needed for next level
         xp_needed = level**2 * 100
 
+
+        sorted_users = sorted(results, key=lambda x: (-x[1], -x[2]))
         # Calculate rank (this is just an example, replace it with your actual rank calculation)
-        rank = 1
+        rank = next(i for i, x in enumerate(sorted_users, start=1) if x[0] == user_id)
 
         return {
             'level': level,
