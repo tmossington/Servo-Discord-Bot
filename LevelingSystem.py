@@ -15,7 +15,7 @@ from easy_pil import Canvas, Editor, Font, load_image_async, Text
 import os
 import json
 from dotenv import load_dotenv
-
+import time
 # Componenets:
 
 # 1. XP system
@@ -35,6 +35,7 @@ class LevelingSystem(commands.Cog):
         self.user_xp = {}
         self.user_level = {}
         self.connection, self.cursor = self.connect_to_db()
+        self.last_message_time = {}
     
     
     #GUILD_ID = 1059619615950516334
@@ -107,6 +108,11 @@ class LevelingSystem(commands.Cog):
         
         user_id = message.author.id
         username = str(message.author)
+
+        current_time = time.time()
+        if user_id in self.last_message_time and current_time - self.last_message_time[user_id] < 60:
+            return
+        self.last_message_time[user_id] = current_time
 
         # Fetch user's current level and XP from database
         self.cursor.execute("SELECT username, level, xp FROM user_levels WHERE user_id = %s", (user_id,))
